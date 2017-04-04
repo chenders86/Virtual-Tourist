@@ -8,22 +8,28 @@
 
 /* Begin PBXBuildFile section */
 		C9C1441C1E92C601003BDB41 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C1441B1E92C601003BDB41 /* AppDelegate.swift */; };
-		C9C1441E1E92C601003BDB41 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C1441D1E92C601003BDB41 /* ViewController.swift */; };
 		C9C144211E92C602003BDB41 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C9C1441F1E92C602003BDB41 /* Main.storyboard */; };
 		C9C144241E92C602003BDB41 /* Virtual_Tourist.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C9C144221E92C602003BDB41 /* Virtual_Tourist.xcdatamodeld */; };
 		C9C144261E92C602003BDB41 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C9C144251E92C602003BDB41 /* Assets.xcassets */; };
 		C9C144291E92C602003BDB41 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C9C144271E92C602003BDB41 /* LaunchScreen.storyboard */; };
+		C9C144341E92CAF3003BDB41 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C144331E92CAF3003BDB41 /* MapViewController.swift */; };
+		C9C144361E92DCF4003BDB41 /* Annotations.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C144351E92DCF4003BDB41 /* Annotations.swift */; };
+		C9C144381E92E874003BDB41 /* Flicker Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C144371E92E874003BDB41 /* Flicker Client.swift */; };
+		C9C1443A1E92E8E6003BDB41 /* Flicker Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C144391E92E8E6003BDB41 /* Flicker Constants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		C9C144181E92C601003BDB41 /* Virtual Tourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Virtual Tourist.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9C1441B1E92C601003BDB41 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		C9C1441D1E92C601003BDB41 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		C9C144201E92C602003BDB41 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C9C144231E92C602003BDB41 /* Virtual_Tourist.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Virtual_Tourist.xcdatamodel; sourceTree = "<group>"; };
 		C9C144251E92C602003BDB41 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C9C144281E92C602003BDB41 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C9C1442A1E92C602003BDB41 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C9C144331E92CAF3003BDB41 /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
+		C9C144351E92DCF4003BDB41 /* Annotations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Annotations.swift; sourceTree = "<group>"; };
+		C9C144371E92E874003BDB41 /* Flicker Client.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Flicker Client.swift"; sourceTree = "<group>"; };
+		C9C144391E92E8E6003BDB41 /* Flicker Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Flicker Constants.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,8 +62,10 @@
 		C9C1441A1E92C601003BDB41 /* Virtual Tourist */ = {
 			isa = PBXGroup;
 			children = (
+				C9C144321E92CA31003BDB41 /* Controller */,
+				C9C144311E92CA2B003BDB41 /* View */,
+				C9C144301E92CA1B003BDB41 /* Model */,
 				C9C1441B1E92C601003BDB41 /* AppDelegate.swift */,
-				C9C1441D1E92C601003BDB41 /* ViewController.swift */,
 				C9C1441F1E92C602003BDB41 /* Main.storyboard */,
 				C9C144251E92C602003BDB41 /* Assets.xcassets */,
 				C9C144271E92C602003BDB41 /* LaunchScreen.storyboard */,
@@ -65,6 +73,31 @@
 				C9C144221E92C602003BDB41 /* Virtual_Tourist.xcdatamodeld */,
 			);
 			path = "Virtual Tourist";
+			sourceTree = "<group>";
+		};
+		C9C144301E92CA1B003BDB41 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				C9C144351E92DCF4003BDB41 /* Annotations.swift */,
+				C9C144371E92E874003BDB41 /* Flicker Client.swift */,
+				C9C144391E92E8E6003BDB41 /* Flicker Constants.swift */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		C9C144311E92CA2B003BDB41 /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = View;
+			sourceTree = "<group>";
+		};
+		C9C144321E92CA31003BDB41 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				C9C144331E92CAF3003BDB41 /* MapViewController.swift */,
+			);
+			name = Controller;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -139,9 +172,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C9C1441E1E92C601003BDB41 /* ViewController.swift in Sources */,
+				C9C144381E92E874003BDB41 /* Flicker Client.swift in Sources */,
 				C9C144241E92C602003BDB41 /* Virtual_Tourist.xcdatamodeld in Sources */,
 				C9C1441C1E92C601003BDB41 /* AppDelegate.swift in Sources */,
+				C9C1443A1E92E8E6003BDB41 /* Flicker Constants.swift in Sources */,
+				C9C144361E92DCF4003BDB41 /* Annotations.swift in Sources */,
+				C9C144341E92CAF3003BDB41 /* MapViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
