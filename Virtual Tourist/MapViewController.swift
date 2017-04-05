@@ -11,14 +11,12 @@ import MapKit
 
 class MapViewController: UIViewController, MKMapViewDelegate {
     
+    
     @IBOutlet weak var mapView: MKMapView!
     
     @IBAction func clearPinData(_ sender: UIButton) {
         self.mapView.removeAnnotations(mapView.annotations)
     }
-    
-    
-    
     
 
     override func viewDidLoad() {
@@ -30,6 +28,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.hidesBarsOnSwipe = true
+        self.mapView.centerCoordinate = setMapCenter()
+        self.mapView.region.span = setDeltas()
         // add pins
     }
     
@@ -49,6 +49,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        
         let reuseID = "pin"
         
         var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseID) as? MKPinAnnotationView
@@ -76,7 +77,15 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
     }
     
+    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+        UserDefaults.standard.set((self.mapView.region.center.latitude) as Double, forKey: "MapCenterLat")
+        UserDefaults.standard.set((self.mapView.region.center.longitude) as Double, forKey: "MapCenterLon")
+        UserDefaults.standard.set((self.mapView.region.span.latitudeDelta) as Double, forKey: "MapDeltaLat")
+        UserDefaults.standard.set((self.mapView.region.span.longitudeDelta) as Double, forKey: "MapDeltaLon")
+    }
     
+    // Extra setup functions
+
     func addUserPin(gestureRecognizer: UIGestureRecognizer) {
         let touchPoint = gestureRecognizer.location(in: mapView)
         let newCoordinates = mapView.convert(touchPoint, toCoordinateFrom: mapView)
@@ -105,9 +114,30 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         // save annotation using Core Data
     }
     
-    func addTouch() {
+    private func addTouch() {
         let uiTouch = UILongPressGestureRecognizer(target: self, action: #selector(addUserPin))
         uiTouch.minimumPressDuration = 0.5
         mapView.addGestureRecognizer(uiTouch)
+    }
+    
+    private func setMapCenter() -> CLLocationCoordinate2D {
+        
+        let lat = UserDefaults.standard.value(forKey: "MapCenterLat") as! CLLocationDegrees
+        let lon = UserDefaults.standard.value(forKey: "MapCenterLon") as! CLLocationDegrees
+        
+        let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        
+        return coordinate
+        
+    }
+    
+    func setDeltas() -> MKCoordinateSpan {
+        
+        let latDelta = UserDefaults.standard.value(forKey: "MapDeltaLat") as! CLLocationDegrees
+        let lonDelta = UserDefaults.standard.value(forKey: "MapDeltaLon") as! CLLocationDegrees
+        
+        let deltas = MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lonDelta)
+        
+        return deltas
     }
 }

@@ -13,10 +13,26 @@ import CoreData
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    
+    func checkForFirstLaunch() {
+        
+        if UserDefaults.standard.bool(forKey: "HasLaunchedBefore") {
+            print("This app has launched before!")
+        } else {
+            print("This is the first launch!")
+            UserDefaults.standard.set(true, forKey: "HasLaunchedBefore")
+            UserDefaults.standard.set(39.5, forKey: "MapCenterLat")
+            UserDefaults.standard.set(-98.35, forKey: "MapCenterLon")
+            UserDefaults.standard.set(0.0, forKey: "MapDeltaLat")
+            UserDefaults.standard.set(0.0, forKey: "MapDeltaLon")
+        }
+    }
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        checkForFirstLaunch()
         return true
     }
 
