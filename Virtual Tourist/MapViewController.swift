@@ -28,8 +28,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.hidesBarsOnSwipe = true
-        self.mapView.centerCoordinate = setMapCenter()
-        self.mapView.region.span = setDeltas()
+        setMapCenter()
+        
         // add pins
     }
     
@@ -120,24 +120,19 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         mapView.addGestureRecognizer(uiTouch)
     }
     
-    private func setMapCenter() -> CLLocationCoordinate2D {
+    private func setMapCenter() {
         
         let lat = UserDefaults.standard.value(forKey: "MapCenterLat") as! CLLocationDegrees
         let lon = UserDefaults.standard.value(forKey: "MapCenterLon") as! CLLocationDegrees
         
-        let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
-        
-        return coordinate
-        
-    }
-    
-    func setDeltas() -> MKCoordinateSpan {
+        let centerCoordinates = CLLocationCoordinate2D(latitude: lat, longitude: lon)
         
         let latDelta = UserDefaults.standard.value(forKey: "MapDeltaLat") as! CLLocationDegrees
         let lonDelta = UserDefaults.standard.value(forKey: "MapDeltaLon") as! CLLocationDegrees
         
-        let deltas = MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lonDelta)
+        let coordSpan = MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lonDelta)
         
-        return deltas
+        mapView.region.center = centerCoordinates
+        mapView.region.span = coordSpan
     }
 }
