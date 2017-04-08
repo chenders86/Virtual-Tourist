@@ -124,12 +124,10 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         
         let lat = UserDefaults.standard.value(forKey: "MapCenterLat") as! CLLocationDegrees
         let lon = UserDefaults.standard.value(forKey: "MapCenterLon") as! CLLocationDegrees
-        
         let centerCoordinates = CLLocationCoordinate2D(latitude: lat, longitude: lon)
         
         let latDelta = UserDefaults.standard.value(forKey: "MapDeltaLat") as! CLLocationDegrees
         let lonDelta = UserDefaults.standard.value(forKey: "MapDeltaLon") as! CLLocationDegrees
-        
         let coordSpan = MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lonDelta)
         
         mapView.region.center = centerCoordinates
