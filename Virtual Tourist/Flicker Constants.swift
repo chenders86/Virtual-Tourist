@@ -28,6 +28,7 @@ struct Constants {
         static let SafeSearch = "safe_search"
         static let Text = "text"
         static let BoundingBox = "bbox"
+        static let PerPage = "per_page"
         static let Page = "page"
         static let Latitude = "lat"
         static let Longitude = "lon"
@@ -45,6 +46,7 @@ struct Constants {
         static let MediaType = "photos"
         static let MediumURL = "url_m"
         static let UseSafeSearch = "1"
+        static let PerPage = "24"
         static let Radius = "10"
         static let RadiusUnits = "mi"
     }

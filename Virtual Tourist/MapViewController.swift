@@ -16,6 +16,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     @IBAction func clearPinData(_ sender: UIButton) {
         self.mapView.removeAnnotations(mapView.annotations)
+        // delete pins in core data
     }
     
 
@@ -105,8 +106,9 @@ class MapViewController: UIViewController, MKMapViewDelegate {
                 return
             }
             
-            annotation.title = placemark.name
-            annotation.subtitle = placemark.locality
+            // if let unwrap to set city, state, zip
+            annotation.title = placemark.locality
+            annotation.subtitle = placemark.administrativeArea
         }
         
         mapView.addAnnotation(annotation)

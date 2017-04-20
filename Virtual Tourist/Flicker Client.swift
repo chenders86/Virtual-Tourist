@@ -28,7 +28,7 @@ class FlickerClient: NSObject {
     
     func getPageCount(annotationView view: MKAnnotationView) {
         
-        // get number of pages returned from flikr
+        // gets number of pages returned from flikr
         
         let lat = view.annotation?.coordinate.latitude
         let lon = view.annotation?.coordinate.longitude
@@ -89,8 +89,12 @@ class FlickerClient: NSObject {
                     return
                 }
                 
-                // get total pages
-
+                guard let totalPages = photoDict[Constants.FlickrResponseKeys.Pages] as? Int else {
+                    print("Pages key not found")
+                    return
+                }
+                
+                self.getPhotosForPin(annotationView: view, numberOfPages: totalPages)
             }
             
         }
@@ -98,17 +102,16 @@ class FlickerClient: NSObject {
         task.resume()
     }
     
-    func getPhotosForPin(annotationView view: MKAnnotationView, completionHandlerForGetPhotos: @escaping (_ result: AnyObject?, _ error: Error?) -> Void) {
+    func getPhotosForPin(annotationView view: MKAnnotationView, numberOfPages: Int) {
         
-        getPageCount(annotationView: view)
-        
-        let pageCount = self.pageCount
-        let randomPage = self.randomPage
     
         let lat = view.annotation?.coordinate.latitude
         let lon = view.annotation?.coordinate.longitude
         let latString = String(describing: lat)
         let lonString = String(describing: lon)
+        
+        let pageLimit = min(numberOfPages, 50)
+        let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
         
         
         let session = URLSession.shared
@@ -126,9 +129,11 @@ class FlickerClient: NSObject {
         request.addValue(Constants.FlickrParameterKeys.Format, forHTTPHeaderField: Constants.FlickrParameterValues.ResponseFormat)
         request.addValue(Constants.FlickrParameterKeys.NoJSONCallback, forHTTPHeaderField: Constants.FlickrParameterValues.DisableJSONCallback)
         request.addValue(Constants.FlickrParameterKeys.Radius, forHTTPHeaderField: Constants.FlickrParameterValues.Radius)
-        request.addValue(Constants.FlickrParameterKeys.RadiusUnits, forHTTPHeaderField: Constants.FlickrParameterKeys.RadiusUnits)
+        request.addValue(Constants.FlickrParameterKeys.RadiusUnits, forHTTPHeaderField: Constants.FlickrParameterValues.RadiusUnits)
         request.addValue(Constants.FlickrParameterKeys.Latitude, forHTTPHeaderField: latString)
         request.addValue(Constants.FlickrParameterKeys.Longitude, forHTTPHeaderField: lonString)
+        request.addValue(Constants.FlickrParameterKeys.PerPage, forHTTPHeaderField: Constants.FlickrParameterValues.PerPage)
+        request.addValue(Constants.FlickrParameterKeys.Page, forHTTPHeaderField: String(randomPage))
         
         let task = session.dataTask(with: request as URLRequest) { (data, response, error) in
             
@@ -150,7 +155,7 @@ class FlickerClient: NSObject {
             self.convertData(data: data) { (result, error) in
                 
                 if error != nil {
-                    completionHandlerForGetPhotos(nil, error)
+                    // send error
                     return
                 }
                 
