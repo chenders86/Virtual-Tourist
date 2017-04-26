@@ -53,22 +53,6 @@ class CoreDataCollectionViewController: UICollectionViewController, NSFetchedRes
     
     // FetchedResultsControllerDelegate
     
-    // DO I EVEN NEED THIS FUNCTION SINCE I ONLY HAVE 1 SECTION???
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) { // Sets up editing of sections when a request is made
-        
-        let set = IndexSet(integer: sectionIndex)
-        
-        switch (type) {
-        case .insert:
-            collectionView?.insertSections(set)
-        case .delete:
-            collectionView?.deleteSections(set)
-        default:
-            break
-        }
-    }
-    
-    // NOT SURE IF THIS IS CORRECT IMPLEMENTATION FOR COLLECTION VIEW
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) { // Sets up editing of rows when a request is made
         
         switch (type) {
@@ -84,9 +68,9 @@ class CoreDataCollectionViewController: UICollectionViewController, NSFetchedRes
         }
     }
     
-    // WHAT DO I DO WITH THIS FUNCTION??? SHOULD ^^ BE PERFORMED IN THE BELOW FUNCTION??
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) { // NEED HELP IMPLEMENTING
-        collectionView?.performBatchUpdates(<#T##updates: (() -> Void)?##(() -> Void)?##() -> Void#>, completion: <#T##((Bool) -> Void)?##((Bool) -> Void)?##(Bool) -> Void#>)
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        collectionView?.performBatchUpdates({self.collectionView?.reloadData()})
     }
     
     // performFetch
