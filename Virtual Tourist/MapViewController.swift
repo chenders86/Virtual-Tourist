@@ -113,7 +113,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         
         mapView.addAnnotation(annotation)
         
-        // save annotation using Core Data
+        // save/create Pin using Core Data
     }
     
     private func addTouch() {

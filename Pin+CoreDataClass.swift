@@ -21,9 +21,7 @@ public class Pin: NSManagedObject {
             self.latitude = latitude
             self.longitude = longitude
         } else {
-            let userInfo = [NSLocalizedDescriptionKey:"Creation of Pin instance failed"]
-            let error = NSError(domain: "Pin Class", code: 1, userInfo: userInfo)
-            print(error.localizedDescription)
+            fatalError("Unable to find Pin entity")
         }
     }
 }

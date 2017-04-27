@@ -22,15 +22,20 @@ class CoreDataCollectionViewController: UICollectionViewController, NSFetchedRes
         }
     }
     
-    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
-    // minimum line spacing
-    // minimum inter item spacing
-    // itemSize
+    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout! // Should this be declared in a subclass? If not, is this implementation correct?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        flowLayout.minimumInteritemSpacing = 0
+        flowLayout.minimumLineSpacing = 0
+        flowLayout.itemSize = CGSize(width: 1.0, height: 1.0)
+    }
     
     // Initialize
     
     init(fetchedResultsController fc: NSFetchedResultsController<NSFetchRequestResult>) {
         fetchedResultsController = fc
+        super.init(collectionViewLayout: flowLayout) // is this correct?
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -70,7 +75,7 @@ class CoreDataCollectionViewController: UICollectionViewController, NSFetchedRes
     
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        collectionView?.performBatchUpdates({self.collectionView?.reloadData()})
+        collectionView?.performBatchUpdates({self.collectionView?.reloadData()}) // is this correct?
     }
     
     // performFetch

@@ -26,7 +26,7 @@ class FlickerClient: NSObject {
     var randomPage = 0
     
     
-    func getPageCount(annotationView view: MKAnnotationView) {
+    func getRandomPhotosForPin(annotationView view: MKAnnotationView) { // Will probably have to chance input from MKAnnotationView to plain coordinates
         
         // gets number of pages returned from flikr
         
