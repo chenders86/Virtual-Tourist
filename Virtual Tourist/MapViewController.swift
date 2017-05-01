@@ -22,6 +22,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     let context = CoreDataStack.sharedInstance().context
     
+    var selectedAnnotation = MKPointAnnotation()
+    
     
     @IBAction func clearPinData(_ sender: UIButton) {
         self.mapView.removeAnnotations(mapView.annotations)
@@ -80,7 +82,9 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
         if control == view.rightCalloutAccessoryView {
             
-            // will need to implement segue
+            selectedAnnotation = view.annotation as! MKPointAnnotation
+            
+            self.performSegue(withIdentifier: "PhotosView", sender: view)
         }
 
     }

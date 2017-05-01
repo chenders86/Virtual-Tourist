@@ -47,6 +47,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="mapView" destination="IJG-gb-B6e" id="ZPu-av-Ka3"/>
+                        <segue destination="3ao-7y-e5s" kind="show" identifier="PhotosView" id="lFu-zG-bJY"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -57,7 +58,7 @@
         <scene sceneID="tC6-JZ-Mlo">
             <objects>
                 <collectionViewController storyboardIdentifier="PinPhotosVC" id="3ao-7y-e5s" customClass="PinPhotosViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
-                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="g12-ri-hez">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" dataMode="prototypes" id="g12-ri-hez">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>

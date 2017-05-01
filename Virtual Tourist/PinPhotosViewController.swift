@@ -15,11 +15,18 @@ class PinPhotosViewController: UICollectionViewController {
     
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
+    let annotation = MKPointAnnotation()
+    
+    let stack = CoreDataStack.sharedInstance()
+    
+    let context = CoreDataStack.sharedInstance().context
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         flowLayout.minimumInteritemSpacing = 0
         flowLayout.minimumLineSpacing = 0
         flowLayout.itemSize = CGSize(width: 1.0, height: 1.0)
+        // display images with FR
     }
     
 }

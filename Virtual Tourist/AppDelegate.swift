@@ -13,7 +13,7 @@ import CoreData
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    let stack = CoreDataStack(modelName: "Virtual_Tourist")
+    //let stack = CoreDataStack(modelName: "Virtual_Tourist")
     
     func checkForFirstLaunch() {
         
