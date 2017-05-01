@@ -8,11 +8,20 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class MapViewController: UIViewController, MKMapViewDelegate {
     
     
     @IBOutlet weak var mapView: MKMapView!
+    
+    
+    let fetchRequest = NSFetchRequest<Pin>(entityName: "Pin")
+    
+    let stack = CoreDataStack.sharedInstance()
+    
+    let context = CoreDataStack.sharedInstance().context
+    
     
     @IBAction func clearPinData(_ sender: UIButton) {
         self.mapView.removeAnnotations(mapView.annotations)
@@ -24,14 +33,12 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         super.viewDidLoad()
         mapView.delegate = self
         addTouch()
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.hidesBarsOnSwipe = true
         setMapCenter()
-        
-        // add pins
+        displayPins()
     }
     
     
@@ -113,7 +120,17 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         
         mapView.addAnnotation(annotation)
         
-        // save/create Pin using Core Data
+        //create Pin using Core Data
+        let pin = Pin(title: annotation.title, subtitle: annotation.subtitle, latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context)
+        
+        
+        FlickerClient.sharedInstance().getRandomPhotosForPin(pin: pin) { photos in
+            for photo in photos {
+                pin.addToPhotos(photo)
+            }
+        }
+        
+        stack.save()
     }
     
     private func addTouch() {
@@ -134,5 +151,25 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         
         mapView.region.center = centerCoordinates
         mapView.region.span = coordSpan
+    }
+    
+    private func displayPins() {
+        
+        // Display loading symbol
+        
+        do {
+            let fetchedResults = try context.fetch(fetchRequest)
+            
+            for pin in fetchedResults {
+                let annotation = MKPointAnnotation()
+                annotation.coordinate.latitude = pin.latitude
+                annotation.coordinate.longitude = pin.longitude
+                annotation.title = pin.title
+                annotation.subtitle = pin.subtitle
+                mapView.addAnnotation(annotation)
+            }
+        } catch {
+            fatalError("Could not fetch Pins for MapView")
+        }
     }
 }

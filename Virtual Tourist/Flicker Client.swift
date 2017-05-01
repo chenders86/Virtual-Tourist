@@ -21,19 +21,20 @@ class FlickerClient: NSObject {
         
         return Singleton.sharedInstance
     }
+
     
-    var pageCount = 0
-    var randomPage = 0
+    let stack = CoreDataStack.sharedInstance()
+    let context = CoreDataStack.sharedInstance().context
     
     
-    func getRandomPhotosForPin(annotationView view: MKAnnotationView) { // Will probably have to chance input from MKAnnotationView to plain coordinates
+    func getRandomPhotosForPin(pin pinView: Pin, completionHandlerForRandomPhotos: @escaping (_ photos: [Photo]) -> Void) {
         
         // gets number of pages returned from flikr
         
-        let lat = view.annotation?.coordinate.latitude
-        let lon = view.annotation?.coordinate.longitude
-        let latString = String(describing: lat)
-        let lonString = String(describing: lon)
+        let lat = pinView.latitude
+        let lon = pinView.longitude
+        let latString = String(lat)
+        let lonString = String(lon)
         print(latString, lonString)
         
         let session = URLSession.shared
@@ -94,7 +95,9 @@ class FlickerClient: NSObject {
                     return
                 }
                 
-                self.getPhotosForPin(annotationView: view, numberOfPages: totalPages)
+                self.getPhotosForPin(pin: pinView, numberOfPages: totalPages) { photos in
+                    completionHandlerForRandomPhotos(photos)
+                }
             }
             
         }
@@ -102,13 +105,13 @@ class FlickerClient: NSObject {
         task.resume()
     }
     
-    func getPhotosForPin(annotationView view: MKAnnotationView, numberOfPages: Int) {
+    private func getPhotosForPin(pin pinView: Pin, numberOfPages: Int, completionForGetPhotos: @escaping (_ photos: [Photo]) -> Void) {
         
     
-        let lat = view.annotation?.coordinate.latitude
-        let lon = view.annotation?.coordinate.longitude
-        let latString = String(describing: lat)
-        let lonString = String(describing: lon)
+        let lat = pinView.latitude
+        let lon = pinView.longitude
+        let latString = String(lat)
+        let lonString = String(lon)
         
         let pageLimit = min(numberOfPages, 50)
         let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
@@ -174,14 +177,19 @@ class FlickerClient: NSObject {
                     return
                 }
                 
+                var allPhotos = [Photo]()
+                
                 for photo in photoArray {
-                    if let urlM = photo["url_m"] as? String {
-                        if let geoPic = UIImage(contentsOfFile: urlM) {         // store as Pins & Photos instead
-                            GeoPics.sharedInstance().allGeoPics.append(geoPic)
-                            print("\(geoPic.description)")
+                    if let urlM = photo["url_m"] as? URL {
+                        if let photoData = NSData(contentsOf: urlM) {
+                            let photo = Photo(imageData: photoData, context: self.context)
+                            allPhotos.append(photo)
+                            print(photo)
                         }
                     }
                 }
+                
+                completionForGetPhotos(allPhotos)
             }
         }
         

@@ -10,7 +10,16 @@ import Foundation
 import MapKit
 import CoreData
 
-class PinPhotosViewController: CoreDataCollectionViewController {
+class PinPhotosViewController: UICollectionViewController {
     
+    
+    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        flowLayout.minimumInteritemSpacing = 0
+        flowLayout.minimumLineSpacing = 0
+        flowLayout.itemSize = CGSize(width: 1.0, height: 1.0)
+    }
     
 }

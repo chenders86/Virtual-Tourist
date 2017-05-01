@@ -111,4 +111,17 @@ struct CoreDataStack {
         try coordinator.destroyPersistentStore(at: dbURL, ofType: NSSQLiteStoreType , options: nil)
         try addStoreCoordinator(NSSQLiteStoreType, configuration: nil, storeURL: dbURL, options: nil)
     }
+    
+    // singleton -> CoreDataStack -> once
+    
+    static func sharedInstance() -> CoreDataStack  {
+        struct Singleton {
+            static var sharedInstance = CoreDataStack(modelName: "Virtual_Tourist")
+        }
+        if let sI = Singleton.sharedInstance {
+            return sI
+        } else {
+            fatalError("Cannot find model named Virtual_Tourist")
+        }
+    }
 }

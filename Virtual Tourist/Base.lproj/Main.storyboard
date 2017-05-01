@@ -57,7 +57,7 @@
         <scene sceneID="tC6-JZ-Mlo">
             <objects>
                 <collectionViewController storyboardIdentifier="PinPhotosVC" id="3ao-7y-e5s" customClass="PinPhotosViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
-                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" dataMode="prototypes" id="g12-ri-hez">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="g12-ri-hez">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -83,7 +83,7 @@
                         </connections>
                     </collectionView>
                     <connections>
-                        <outlet property="flowLayout" destination="cCH-o8-Q4N" id="LGH-JE-fAS"/>
+                        <outlet property="flowLayout" destination="cCH-o8-Q4N" id="Jl7-gu-oUO"/>
                     </connections>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kA3-Pi-w9e" userLabel="First Responder" sceneMemberID="firstResponder"/>
