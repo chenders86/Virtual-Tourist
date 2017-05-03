@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		C939CB531EB2A5B300636420 /* PinPhotosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C939CB521EB2A5B300636420 /* PinPhotosViewController.swift */; };
 		C95DDE6D1EAA797000B5625B /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = C95DDE6C1EAA797000B5625B /* CoreDataStack.swift */; };
+		C9B39CE41EBA685F004689FF /* PinImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9B39CE31EBA685F004689FF /* PinImageCollectionViewCell.swift */; };
 		C9C1441C1E92C601003BDB41 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C1441B1E92C601003BDB41 /* AppDelegate.swift */; };
 		C9C144211E92C602003BDB41 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C9C1441F1E92C602003BDB41 /* Main.storyboard */; };
 		C9C144241E92C602003BDB41 /* Virtual_Tourist.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C9C144221E92C602003BDB41 /* Virtual_Tourist.xcdatamodeld */; };
@@ -26,6 +27,7 @@
 /* Begin PBXFileReference section */
 		C939CB521EB2A5B300636420 /* PinPhotosViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinPhotosViewController.swift; sourceTree = "<group>"; };
 		C95DDE6C1EAA797000B5625B /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
+		C9B39CE31EBA685F004689FF /* PinImageCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinImageCollectionViewCell.swift; sourceTree = "<group>"; };
 		C9C144181E92C601003BDB41 /* Virtual Tourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Virtual Tourist.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9C1441B1E92C601003BDB41 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C9C144201E92C602003BDB41 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 		C9C144311E92CA2B003BDB41 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				C9B39CE31EBA685F004689FF /* PinImageCollectionViewCell.swift */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -195,6 +198,7 @@
 				C9C144241E92C602003BDB41 /* Virtual_Tourist.xcdatamodeld in Sources */,
 				C9C1441C1E92C601003BDB41 /* AppDelegate.swift in Sources */,
 				C9D4386F1EB10E7D0082B8D8 /* Pin+CoreDataClass.swift in Sources */,
+				C9B39CE41EBA685F004689FF /* PinImageCollectionViewCell.swift in Sources */,
 				C9D438721EB10E7D0082B8D8 /* Photo+CoreDataProperties.swift in Sources */,
 				C9C1443A1E92E8E6003BDB41 /* Flicker Constants.swift in Sources */,
 				C9C144341E92CAF3003BDB41 /* MapViewController.swift in Sources */,

@@ -45,15 +45,24 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     
 
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
+        if segue.identifier == "PhotosView" {
+            
+            let newVC = segue.destination as! PinPhotosViewController
+            
+            newVC.annotation = selectedAnnotation
+            
+            //self.navigationController?.pushViewController(newVC, animated: true)
+        }
+        
     }
-    */
+ 
     
     // MapView Delegate:
     
