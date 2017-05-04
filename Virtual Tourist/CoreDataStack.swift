@@ -89,7 +89,7 @@ struct CoreDataStack {
             
             if self.context.hasChanges {
                 do {
-                    try self.save()
+                    try self.context.save()
                 } catch {
                     fatalError("Error while trying to save main context: \(error)")
                 }

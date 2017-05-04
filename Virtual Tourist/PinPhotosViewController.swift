@@ -63,7 +63,7 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
     // PhotosView Delegate
     
 //    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        <#code#>
+//
 //    }
     
     
@@ -80,7 +80,6 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseID)
             pinView?.canShowCallout = false
             pinView?.pinTintColor = .green
-            //pinView?.isDraggable = true
             
         } else {
             pinView?.annotation = annotation

@@ -52,9 +52,10 @@ class FlickerClient: NSObject {
         request.addValue(Constants.FlickrParameterKeys.Format, forHTTPHeaderField: Constants.FlickrParameterValues.ResponseFormat)
         request.addValue(Constants.FlickrParameterKeys.NoJSONCallback, forHTTPHeaderField: Constants.FlickrParameterValues.DisableJSONCallback)
         request.addValue(Constants.FlickrParameterKeys.Radius, forHTTPHeaderField: Constants.FlickrParameterValues.Radius)
-        request.addValue(Constants.FlickrParameterKeys.RadiusUnits, forHTTPHeaderField: Constants.FlickrParameterKeys.RadiusUnits)
+        request.addValue(Constants.FlickrParameterKeys.RadiusUnits, forHTTPHeaderField: Constants.FlickrParameterValues.RadiusUnits)
         request.addValue(Constants.FlickrParameterKeys.Latitude, forHTTPHeaderField: latString)
         request.addValue(Constants.FlickrParameterKeys.Longitude, forHTTPHeaderField: lonString)
+        // All parameters check out ok in Rested app
         
         let task = session.dataTask(with: request as URLRequest) { (data, response, error) in
             
@@ -76,7 +77,7 @@ class FlickerClient: NSObject {
             self.convertData(data: data) { (result, error) in
                 
                 if error != nil {
-                    // send error
+                    print(error!.localizedDescription)
                     return
                 }
                 
@@ -115,6 +116,7 @@ class FlickerClient: NSObject {
         
         let pageLimit = min(numberOfPages, 50)
         let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
+        print(randomPage)
         
         
         let session = URLSession.shared
@@ -203,7 +205,7 @@ class FlickerClient: NSObject {
         do {
             parsedResult = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as AnyObject
         } catch {
-            print("Error parsing JSON")
+            print("Error parsing JSON (convertData)")
             let userInfo = [NSLocalizedDescriptionKey: "JSON serialization failed"]
             completionHandler(nil, NSError(domain: "convertData", code: 1, userInfo: userInfo))
         }
