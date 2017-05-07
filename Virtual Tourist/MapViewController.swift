@@ -117,7 +117,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         
         CLGeocoder().reverseGeocodeLocation(location) { (placemarks, error) in
             guard error == nil else {
-                print("Reverse geocoding failed" + (error?.localizedDescription)!)
+                print("Reverse geocoding failed" + "" + (error?.localizedDescription)!)
                 return
             }
             
@@ -133,13 +133,13 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         
         mapView.addAnnotation(annotation)
         
-        //create Pin using Core Data
         let pin = Pin(title: annotation.title, subtitle: annotation.subtitle, latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context)
         
         
         FlickerClient.sharedInstance().getRandomPhotosForPin(pin: pin) { photos in
             for photo in photos {
                 pin.addToPhotos(photo)
+                print(photo)
             }
         }
         

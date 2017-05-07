@@ -35,27 +35,24 @@ class FlickerClient: NSObject {
         let lon = pinView.longitude
         let latString = String(lat)
         let lonString = String(lon)
-        print(latString, lonString)
+        //print(latString, lonString)
         
         let session = URLSession.shared
         
-        var url = URLComponents()
-        url.scheme = Constants.Flickr.APIScheme
-        url.host = Constants.Flickr.APIHost
-        url.path = Constants.Flickr.APIPath
+        let queryItems = [Constants.FlickrParameterKeys.Method:Constants.FlickrParameterValues.SearchMethod,
+                          Constants.FlickrParameterKeys.APIKey:Constants.FlickrParameterValues.APIKey,
+                          Constants.FlickrParameterKeys.MediaType:Constants.FlickrParameterValues.MediaType,
+                          Constants.FlickrParameterKeys.Extras:Constants.FlickrParameterValues.MediumURL,
+                          Constants.FlickrParameterKeys.Format:Constants.FlickrParameterValues.ResponseFormat,
+                          Constants.FlickrParameterKeys.NoJSONCallback:Constants.FlickrParameterValues.DisableJSONCallback,
+                          Constants.FlickrParameterKeys.Radius:Constants.FlickrParameterValues.Radius,
+                          Constants.FlickrParameterKeys.RadiusUnits:Constants.FlickrParameterValues.RadiusUnits,
+                          Constants.FlickrParameterKeys.Latitude:latString,
+                          Constants.FlickrParameterKeys.Longitude:lonString]
         
-        let request = NSMutableURLRequest(url: url.url!)
-        request.addValue(Constants.FlickrParameterKeys.Method, forHTTPHeaderField: Constants.FlickrParameterValues.SearchMethod)
-        request.addValue(Constants.FlickrParameterKeys.APIKey, forHTTPHeaderField: Constants.FlickrParameterValues.APIKey)
-        request.addValue(Constants.FlickrParameterKeys.MediaType, forHTTPHeaderField: Constants.FlickrParameterValues.MediaType)
-        request.addValue(Constants.FlickrParameterKeys.Extras, forHTTPHeaderField: Constants.FlickrParameterValues.MediumURL)
-        request.addValue(Constants.FlickrParameterKeys.Format, forHTTPHeaderField: Constants.FlickrParameterValues.ResponseFormat)
-        request.addValue(Constants.FlickrParameterKeys.NoJSONCallback, forHTTPHeaderField: Constants.FlickrParameterValues.DisableJSONCallback)
-        request.addValue(Constants.FlickrParameterKeys.Radius, forHTTPHeaderField: Constants.FlickrParameterValues.Radius)
-        request.addValue(Constants.FlickrParameterKeys.RadiusUnits, forHTTPHeaderField: Constants.FlickrParameterValues.RadiusUnits)
-        request.addValue(Constants.FlickrParameterKeys.Latitude, forHTTPHeaderField: latString)
-        request.addValue(Constants.FlickrParameterKeys.Longitude, forHTTPHeaderField: lonString)
-        // All parameters check out ok in Rested app
+        
+        let request = NSMutableURLRequest(url: constructURL(queryItems as [String : AnyObject]))
+        
         
         let task = session.dataTask(with: request as URLRequest) { (data, response, error) in
             
@@ -116,29 +113,26 @@ class FlickerClient: NSObject {
         
         let pageLimit = min(numberOfPages, 50)
         let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
-        print(randomPage)
+        //print(randomPage)
         
         
         let session = URLSession.shared
         
-        var url = URLComponents()
-        url.scheme = Constants.Flickr.APIScheme
-        url.host = Constants.Flickr.APIHost
-        url.path = Constants.Flickr.APIPath
+        let queryItems = [Constants.FlickrParameterKeys.Method:Constants.FlickrParameterValues.SearchMethod,
+                          Constants.FlickrParameterKeys.APIKey:Constants.FlickrParameterValues.APIKey,
+                          Constants.FlickrParameterKeys.MediaType:Constants.FlickrParameterValues.MediaType,
+                          Constants.FlickrParameterKeys.Extras:Constants.FlickrParameterValues.MediumURL,
+                          Constants.FlickrParameterKeys.Format:Constants.FlickrParameterValues.ResponseFormat,
+                          Constants.FlickrParameterKeys.NoJSONCallback:Constants.FlickrParameterValues.DisableJSONCallback,
+                          Constants.FlickrParameterKeys.Radius:Constants.FlickrParameterValues.Radius,
+                          Constants.FlickrParameterKeys.RadiusUnits:Constants.FlickrParameterValues.RadiusUnits,
+                          Constants.FlickrParameterKeys.Latitude:latString,
+                          Constants.FlickrParameterKeys.Longitude:lonString,
+                          Constants.FlickrParameterKeys.PerPage:Constants.FlickrParameterValues.PerPage,
+                          Constants.FlickrParameterKeys.Page:String(randomPage)]
         
-        let request = NSMutableURLRequest(url: url.url!)
-        request.addValue(Constants.FlickrParameterKeys.Method, forHTTPHeaderField: Constants.FlickrParameterValues.SearchMethod)
-        request.addValue(Constants.FlickrParameterKeys.APIKey, forHTTPHeaderField: Constants.FlickrParameterValues.APIKey)
-        request.addValue(Constants.FlickrParameterKeys.MediaType, forHTTPHeaderField: Constants.FlickrParameterValues.MediaType)
-        request.addValue(Constants.FlickrParameterKeys.Extras, forHTTPHeaderField: Constants.FlickrParameterValues.MediumURL)
-        request.addValue(Constants.FlickrParameterKeys.Format, forHTTPHeaderField: Constants.FlickrParameterValues.ResponseFormat)
-        request.addValue(Constants.FlickrParameterKeys.NoJSONCallback, forHTTPHeaderField: Constants.FlickrParameterValues.DisableJSONCallback)
-        request.addValue(Constants.FlickrParameterKeys.Radius, forHTTPHeaderField: Constants.FlickrParameterValues.Radius)
-        request.addValue(Constants.FlickrParameterKeys.RadiusUnits, forHTTPHeaderField: Constants.FlickrParameterValues.RadiusUnits)
-        request.addValue(Constants.FlickrParameterKeys.Latitude, forHTTPHeaderField: latString)
-        request.addValue(Constants.FlickrParameterKeys.Longitude, forHTTPHeaderField: lonString)
-        request.addValue(Constants.FlickrParameterKeys.PerPage, forHTTPHeaderField: Constants.FlickrParameterValues.PerPage)
-        request.addValue(Constants.FlickrParameterKeys.Page, forHTTPHeaderField: String(randomPage))
+        let request = NSMutableURLRequest(url: constructURL(queryItems as [String : AnyObject]))
+        
         
         let task = session.dataTask(with: request as URLRequest) { (data, response, error) in
             
@@ -186,7 +180,6 @@ class FlickerClient: NSObject {
                         if let photoData = NSData(contentsOf: urlM) {
                             let photo = Photo(imageData: photoData, context: self.context)
                             allPhotos.append(photo)
-                            print(photo)
                         }
                     }
                 }
@@ -197,6 +190,8 @@ class FlickerClient: NSObject {
         
         task.resume()
     }
+    
+    // Utilities
     
     private func convertData(data: Data, completionHandler:(_ result: AnyObject?, _ error: Error?) -> Void) {
         
@@ -211,6 +206,21 @@ class FlickerClient: NSObject {
         }
         
         completionHandler(parsedResult, nil)
+    }
+    
+    private func constructURL(_ dictionary: [String:AnyObject]) -> URL {
+        
+        var components = URLComponents()
+        components.scheme = Constants.Flickr.APIScheme
+        components.host = Constants.Flickr.APIHost
+        components.path = Constants.Flickr.APIPath
+        components.queryItems = [URLQueryItem]()
+        
+        for (key, value) in dictionary {
+            let queryItem = URLQueryItem(name: key, value: "\(value)")
+            components.queryItems!.append(queryItem)
+        }
+        return components.url!
     }
 }
 

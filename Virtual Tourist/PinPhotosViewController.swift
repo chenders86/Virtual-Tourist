@@ -19,6 +19,9 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
     
     @IBOutlet weak var PhotosView: UICollectionView!
     
+    @IBAction func newCollectionButton(_ sender: Any) {
+    }
+    
     var annotation = MKPointAnnotation()
     
     let stack = CoreDataStack.sharedInstance()
@@ -91,6 +94,7 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
         
         do {
             let fetchedResults = try context.fetch(fetchRequest)
+            print(fetchedResults)
             
             let pin = fetchedResults[0]
             
