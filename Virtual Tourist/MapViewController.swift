@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class MapViewController: UIViewController, MKMapViewDelegate {
+class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDelegate {
     
     
     @IBOutlet weak var mapView: MKMapView!
@@ -24,10 +24,16 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     var selectedAnnotation = MKPointAnnotation()
     
+    var locationManager = CLLocationManager()
+    
     
     @IBAction func clearPinData(_ sender: UIButton) {
         self.mapView.removeAnnotations(mapView.annotations)
-        // delete pins in core data
+        do {
+            try stack.dropAllData()
+        } catch {
+            print("Error droping all objects in Database")
+        }
     }
     
 
@@ -35,6 +41,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         super.viewDidLoad()
         mapView.delegate = self
         addTouch()
+        self.locationManager.delegate = self
+        self.locationManager.requestWhenInUseAuthorization()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -46,9 +54,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
 
     
-    // MARK: - Navigation
+    // Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
@@ -57,8 +64,6 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             let newVC = segue.destination as! PinPhotosViewController
             
             newVC.annotation = selectedAnnotation
-            
-            //self.navigationController?.pushViewController(newVC, animated: true)
         }
         
     }
@@ -105,45 +110,85 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         UserDefaults.standard.set((self.mapView.region.span.longitudeDelta) as Double, forKey: "MapDeltaLon")
     }
     
+    // LocationManager Delegate
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        
+        if status == .authorizedWhenInUse {
+            getUserLocation()
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
+        let userLocation = locations[0] as CLLocation
+        
+        self.locationManager.stopUpdatingLocation()
+        
+        let coordinates = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
+        
+        let span = MKCoordinateSpanMake(1.0,1.0)
+        
+        let region = MKCoordinateRegion(center: coordinates, span: span)
+        
+        self.mapView.setRegion(region, animated: true)
+        
+        print("User location initialized")
+        
+    }
+    
+    private func getUserLocation() {
+        self.locationManager.startUpdatingLocation()
+        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        mapView.showsUserLocation = false
+    }
+
+    
     // Extra setup functions
 
     func addUserPin(gestureRecognizer: UIGestureRecognizer) {
-        let touchPoint = gestureRecognizer.location(in: mapView)
-        let newCoordinates = mapView.convert(touchPoint, toCoordinateFrom: mapView)
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = newCoordinates
-        
-        let location = CLLocation(latitude: newCoordinates.latitude, longitude: newCoordinates.longitude)
-        
-        CLGeocoder().reverseGeocodeLocation(location) { (placemarks, error) in
-            guard error == nil else {
-                print("Reverse geocoding failed" + "" + (error?.localizedDescription)!)
-                return
+        if gestureRecognizer.state == .began {
+            
+            let touchPoint = gestureRecognizer.location(in: mapView)
+            let newCoordinates = mapView.convert(touchPoint, toCoordinateFrom: mapView)
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = newCoordinates
+            
+            let location = CLLocation(latitude: newCoordinates.latitude, longitude: newCoordinates.longitude)
+            
+            CLGeocoder().reverseGeocodeLocation(location) { (placemarks, error) in
+                guard error == nil else {
+                    print("Reverse geocoding failed" + "" + (error?.localizedDescription)!)
+                    return
+                }
+                
+                guard let placemark = placemarks?[0] else {
+                    print("No placemarks were returned from the Geocoder")
+                    return
+                }
+                
+                if placemark.locality != nil && placemark.administrativeArea != nil {
+                    annotation.title = (placemark.locality! + ", " + placemark.administrativeArea!)
+                } else {
+                    annotation.title = placemark.locality
+                }
+                annotation.subtitle = placemark.postalCode
             }
             
-            guard let placemark = placemarks?[0] else {
-                print("No placemarks were returned from the Geocoder")
-                return
+            mapView.addAnnotation(annotation)
+            
+            let pin = Pin(title: annotation.title, subtitle: annotation.subtitle, latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context)
+            
+            
+            FlickerClient.sharedInstance().getRandomPhotosForPin(pin: pin) { photos in // for some reason this is not being executed
+                for photo in photos {
+                    pin.addToPhotos(photo)
+                    print("asdfghjkl")
+                }
             }
             
-            // if let unwrap to set city, state, zip
-            annotation.title = placemark.locality
-            annotation.subtitle = placemark.administrativeArea
+            stack.save() //should this move up a few braces to prevent saving before getRandomPhotos is complete?
         }
-        
-        mapView.addAnnotation(annotation)
-        
-        let pin = Pin(title: annotation.title, subtitle: annotation.subtitle, latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context)
-        
-        
-        FlickerClient.sharedInstance().getRandomPhotosForPin(pin: pin) { photos in
-            for photo in photos {
-                pin.addToPhotos(photo)
-                print(photo)
-            }
-        }
-        
-        stack.save()
     }
     
     private func addTouch() {

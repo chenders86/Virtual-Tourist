@@ -35,7 +35,7 @@ class FlickerClient: NSObject {
         let lon = pinView.longitude
         let latString = String(lat)
         let lonString = String(lon)
-        //print(latString, lonString)
+        print(latString, lonString)
         
         let session = URLSession.shared
         
@@ -113,7 +113,9 @@ class FlickerClient: NSObject {
         
         let pageLimit = min(numberOfPages, 50)
         let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
-        //print(randomPage)
+        print("\(numberOfPages) total pages")
+        print("\(pageLimit) page limit")
+        print("\(randomPage) random page number")
         
         
         let session = URLSession.shared
@@ -180,6 +182,7 @@ class FlickerClient: NSObject {
                         if let photoData = NSData(contentsOf: urlM) {
                             let photo = Photo(imageData: photoData, context: self.context)
                             allPhotos.append(photo)
+                            print(photo)
                         }
                     }
                 }

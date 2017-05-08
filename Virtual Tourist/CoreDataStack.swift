@@ -97,6 +97,7 @@ struct CoreDataStack {
                 self.persistingContext.perform() {
                     do {
                         try self.persistingContext.save()
+                        print("stack saved")
                     } catch {
                         fatalError("Error while saving persisting context: \(error)")
                     }
