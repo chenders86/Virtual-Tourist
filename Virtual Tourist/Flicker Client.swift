@@ -178,8 +178,8 @@ class FlickerClient: NSObject {
                 var allPhotos = [Photo]()
                 
                 for photo in photoArray {
-                    if let urlM = photo["url_m"] as? URL {
-                        if let photoData = NSData(contentsOf: urlM) {
+                    if let urlM = photo["url_m"] as? String {
+                        if let photoData = NSData(contentsOf: URL(string: urlM)!) {
                             let photo = Photo(imageData: photoData, context: self.context)
                             allPhotos.append(photo)
                             print(photo)

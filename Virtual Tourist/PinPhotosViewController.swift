@@ -145,8 +145,8 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
     
     private func fetchRequestSetup() {
         
-        let p1 = NSPredicate(format: "latitude = %@", annotation.coordinate.latitude)
-        let p2 = NSPredicate(format: "longitude = %@", annotation.coordinate.longitude)
+        let p1 = NSPredicate(format: "latitude = %lf", annotation.coordinate.latitude)
+        let p2 = NSPredicate(format: "longitude = %lf", annotation.coordinate.longitude)
         let predicates = NSCompoundPredicate(andPredicateWithSubpredicates: [p1, p2])
         
         fetchRequest.predicate = predicates

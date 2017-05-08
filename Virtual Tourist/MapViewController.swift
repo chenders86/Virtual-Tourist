@@ -180,14 +180,13 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
             let pin = Pin(title: annotation.title, subtitle: annotation.subtitle, latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context)
             
             
-            FlickerClient.sharedInstance().getRandomPhotosForPin(pin: pin) { photos in // for some reason this is not being executed
+            FlickerClient.sharedInstance().getRandomPhotosForPin(pin: pin) { photos in
                 for photo in photos {
                     pin.addToPhotos(photo)
-                    print("asdfghjkl")
+                    print(photo)
                 }
+                self.stack.save()
             }
-            
-            stack.save() //should this move up a few braces to prevent saving before getRandomPhotos is complete?
         }
     }
     
