@@ -31,6 +31,8 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         self.mapView.removeAnnotations(mapView.annotations)
         do {
             try stack.dropAllData()
+            print("Pins deleted")
+            print("stack saved")
         } catch {
             print("Error droping all objects in Database")
         }
@@ -57,15 +59,13 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
     // Navigation
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+
         if segue.identifier == "PhotosView" {
             
             let newVC = segue.destination as! PinPhotosViewController
             
             newVC.annotation = selectedAnnotation
         }
-        
     }
  
     
@@ -132,9 +132,6 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         let region = MKCoordinateRegion(center: coordinates, span: span)
         
         self.mapView.setRegion(region, animated: true)
-        
-        print("User location initialized")
-        
     }
     
     private func getUserLocation() {
@@ -177,16 +174,16 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
             
             mapView.addAnnotation(annotation)
             
-            let pin = Pin(title: annotation.title, subtitle: annotation.subtitle, latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context)
-            
-            
-            FlickerClient.sharedInstance().getRandomPhotosForPin(pin: pin) { photos in
-                for photo in photos {
-                    pin.addToPhotos(photo)
-                    print(photo)
-                }
-                self.stack.save()
-            }
+//            let pin = Pin(title: annotation.title, subtitle: annotation.subtitle, latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context)
+//            
+//            
+//            FlickerClient.sharedInstance().getRandomPhotosForPin(pin: pin) { photos in
+//                for photo in photos {
+//                    pin.addToPhotos(photo)
+//                    print(photo)
+//                }
+//                self.stack.save()
+//            }
         }
     }
     

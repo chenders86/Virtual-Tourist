@@ -106,6 +106,7 @@ struct CoreDataStack {
         }
     }
     
+    
     // Delete function
     func dropAllData() throws {
         // delete all the objects in the db.

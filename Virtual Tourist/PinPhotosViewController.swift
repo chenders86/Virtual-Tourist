@@ -10,7 +10,7 @@ import Foundation
 import MapKit
 import CoreData
 
-class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollectionViewDelegate, UICollectionViewDataSource {
+class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
@@ -48,18 +48,19 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        flowLayout.minimumInteritemSpacing = 0
-        flowLayout.minimumLineSpacing = 0
-        flowLayout.itemSize = CGSize(width: 1.0, height: 1.0)
         miniMapView.delegate = self
         photosView.delegate = self
         fetchRequestSetup()
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        miniMapView.addAnnotation(annotation)
-        performPhotoSearch()
+        setMapView()
+        loadPhotos()
         self.deleteButton.isEnabled = false
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        
     }
     
     // PhotosView DataSource
@@ -100,6 +101,28 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
         }
     }
     
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        let cellSize = (self.view.frame.size.width / 3)
+        
+        return CGSize(width: cellSize, height: cellSize)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        let leftRightInset = self.view.frame.size.width / 14.0
+        
+        return UIEdgeInsetsMake(0, leftRightInset, 0, leftRightInset)
+        
+    }
+    
+//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+//        <#code#>
+//    }
+    
+//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+//        <#code#>
+//    }
+    
     
     // MiniMapView Delegate
     
@@ -120,8 +143,9 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
         return pinView
     }
     
+    // Setup Functions
+    
     private func performPhotoSearch() {
-        
         do {
             let fetchedResults = try context.fetch(fetchRequest)
             
@@ -133,13 +157,29 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
                         photosMO.append(image)
                         if let convertedImage = UIImage(data: image.image as! Data) {
                             photos.append(convertedImage)
-                            print(convertedImage)
+                            print(" converted image: \(convertedImage)")
+                            photosView.reloadData()
                         }
                     }
                 }
             }
         } catch {
             fatalError("Cannot perform Photo Search")
+        }
+    }
+    
+    private func loadPhotos() {
+        
+        let pin = Pin(title: annotation.title, subtitle: annotation.subtitle, latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context)
+        
+        
+        FlickerClient.sharedInstance().getRandomPhotosForPin(pin: pin) { photos in
+            for photo in photos {
+                pin.addToPhotos(photo)
+                print(photo)
+            }
+            self.stack.save()
+            self.performPhotoSearch()
         }
     }
     
@@ -152,11 +192,27 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
         fetchRequest.predicate = predicates
     }
     
+    private func setMapView() {
+        
+        miniMapView.addAnnotation(annotation)
+        
+        let span = MKCoordinateSpanMake(0.5, 0.5)
+        
+        let region = MKCoordinateRegion(center: annotation.coordinate, span: span)
+        
+        miniMapView.setRegion(region, animated: true)
+        
+        miniMapView.isRotateEnabled = false
+        miniMapView.isZoomEnabled = false
+        miniMapView.isScrollEnabled = false
+    }
+    
     private func deletePhotos(_ photos: [Photo]) {
         
         for photo in photos {
             context.delete(photo)
         }
+        print("Photos deleted")
         stack.save()
     }
 }
