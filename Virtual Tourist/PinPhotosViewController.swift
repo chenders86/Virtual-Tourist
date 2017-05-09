@@ -10,7 +10,7 @@ import Foundation
 import MapKit
 import CoreData
 
-class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+class PinPhotosViewController: UIViewController {
     
     
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
@@ -30,6 +30,7 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
         self.photoIndexes.removeAll()
         deletePhotos(photosMO)
     }
+    
     @IBOutlet weak var deleteButton: UIBarButtonItem!
     
     var annotation = MKPointAnnotation()
@@ -62,8 +63,10 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
     override func viewDidAppear(_ animated: Bool) {
         
     }
-    
-    // PhotosView DataSource
+}
+
+
+extension PinPhotosViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return photos.count
@@ -78,9 +81,10 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
         
         return cell
     }
-    
-    // PhotosView Delegate
-    
+}
+
+
+extension PinPhotosViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
@@ -100,7 +104,11 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
             deleteButton.isEnabled = false
         }
     }
-    
+}
+
+
+extension PinPhotosViewController: UICollectionViewDelegateFlowLayout {
+
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         let cellSize = (self.view.frame.size.width / 3)
@@ -115,16 +123,18 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
         
     }
     
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-//        <#code#>
-//    }
-    
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-//        <#code#>
-//    }
-    
-    
-    // MiniMapView Delegate
+        //    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        //        <#code#>
+        //    }
+        
+        //    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        //        <#code#>
+        //    }
+        
+}
+
+
+extension PinPhotosViewController: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         
@@ -142,6 +152,10 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
         }
         return pinView
     }
+}
+
+
+extension PinPhotosViewController {
     
     // Setup Functions
     
@@ -158,7 +172,9 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
                         if let convertedImage = UIImage(data: image.image as! Data) {
                             photos.append(convertedImage)
                             print(" converted image: \(convertedImage)")
-                            photosView.reloadData()
+                            DispatchQueue.main.async {
+                                self.photosView.reloadData()
+                            }
                         }
                     }
                 }
@@ -168,7 +184,7 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
         }
     }
     
-    private func loadPhotos() {
+    fileprivate func loadPhotos() {
         
         let pin = Pin(title: annotation.title, subtitle: annotation.subtitle, latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context)
         
@@ -183,7 +199,7 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
         }
     }
     
-    private func fetchRequestSetup() {
+    fileprivate func fetchRequestSetup() {
         
         let p1 = NSPredicate(format: "latitude = %lf", annotation.coordinate.latitude)
         let p2 = NSPredicate(format: "longitude = %lf", annotation.coordinate.longitude)
@@ -192,7 +208,7 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
         fetchRequest.predicate = predicates
     }
     
-    private func setMapView() {
+    fileprivate func setMapView() {
         
         miniMapView.addAnnotation(annotation)
         
@@ -207,7 +223,7 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
         miniMapView.isScrollEnabled = false
     }
     
-    private func deletePhotos(_ photos: [Photo]) {
+    fileprivate func deletePhotos(_ photos: [Photo]) {
         
         for photo in photos {
             context.delete(photo)
@@ -216,3 +232,4 @@ class PinPhotosViewController: UIViewController, MKMapViewDelegate, UICollection
         stack.save()
     }
 }
+

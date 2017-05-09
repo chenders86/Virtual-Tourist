@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDelegate {
+class MapViewController: UIViewController {
     
     
     @IBOutlet weak var mapView: MKMapView!
@@ -67,9 +67,10 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
             newVC.annotation = selectedAnnotation
         }
     }
+}
  
-    
-    // MapView Delegate:
+
+extension MapViewController: MKMapViewDelegate {
     
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
@@ -90,7 +91,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         }
         return pinView
     }
-    
+
     
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
 
@@ -109,8 +110,10 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         UserDefaults.standard.set((self.mapView.region.span.latitudeDelta) as Double, forKey: "MapDeltaLat")
         UserDefaults.standard.set((self.mapView.region.span.longitudeDelta) as Double, forKey: "MapDeltaLon")
     }
+}
     
-    // LocationManager Delegate
+
+extension MapViewController: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         
@@ -139,8 +142,10 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
         mapView.showsUserLocation = false
     }
+}
 
-    
+extension MapViewController {
+
     // Extra setup functions
 
     func addUserPin(gestureRecognizer: UIGestureRecognizer) {
@@ -173,27 +178,16 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
             }
             
             mapView.addAnnotation(annotation)
-            
-//            let pin = Pin(title: annotation.title, subtitle: annotation.subtitle, latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context)
-//            
-//            
-//            FlickerClient.sharedInstance().getRandomPhotosForPin(pin: pin) { photos in
-//                for photo in photos {
-//                    pin.addToPhotos(photo)
-//                    print(photo)
-//                }
-//                self.stack.save()
-//            }
         }
     }
     
-    private func addTouch() {
+    fileprivate func addTouch() {
         let uiTouch = UILongPressGestureRecognizer(target: self, action: #selector(addUserPin))
         uiTouch.minimumPressDuration = 0.5
         mapView.addGestureRecognizer(uiTouch)
     }
     
-    private func setMapCenter() {
+    fileprivate func setMapCenter() {
         
         let lat = UserDefaults.standard.value(forKey: "MapCenterLat") as! CLLocationDegrees
         let lon = UserDefaults.standard.value(forKey: "MapCenterLon") as! CLLocationDegrees
@@ -207,9 +201,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerD
         mapView.region.span = coordSpan
     }
     
-    private func displayPins() {
-        
-        // Display loading symbol
+    fileprivate func displayPins() {
         
         do {
             let fetchedResults = try context.fetch(fetchRequest)
