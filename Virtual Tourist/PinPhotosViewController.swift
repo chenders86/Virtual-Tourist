@@ -26,9 +26,10 @@ class PinPhotosViewController: UIViewController {
     @IBAction func deletePhotos(_ sender: Any) {
         
         photosView.deleteItems(at: photoIndexes)
+        // remove deleted photos from data source... collectionView.indexPathForSelectedItems()...? if i also use sort method will it permanently change photos array below?
         self.deleteButton.isEnabled = false
         self.photoIndexes.removeAll()
-        deletePhotos(photosMO)
+        deletePhotos()
     }
     
     @IBOutlet weak var deleteButton: UIBarButtonItem!
@@ -51,12 +52,14 @@ class PinPhotosViewController: UIViewController {
         super.viewDidLoad()
         miniMapView.delegate = self
         photosView.delegate = self
+        photosView.dataSource = self
+        photosView.allowsMultipleSelection = true
         fetchRequestSetup()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         setMapView()
-        loadPhotos()
+        loadPhotos() // CUrrently returning the same page over and over
         self.deleteButton.isEnabled = false
     }
     
@@ -111,15 +114,16 @@ extension PinPhotosViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        let cellSize = (self.view.frame.size.width / 3)
+        let cellSize = (self.view.frame.size.width / 4)
         
         return CGSize(width: cellSize, height: cellSize)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        let leftRightInset = self.view.frame.size.width / 14.0
+        let leftRightInset = self.view.frame.size.width / 10.0
+        let topBottomInset = CGFloat(0)
         
-        return UIEdgeInsetsMake(0, leftRightInset, 0, leftRightInset)
+        return UIEdgeInsetsMake(topBottomInset, leftRightInset, topBottomInset, leftRightInset)
         
     }
     
@@ -223,11 +227,10 @@ extension PinPhotosViewController {
         miniMapView.isScrollEnabled = false
     }
     
-    fileprivate func deletePhotos(_ photos: [Photo]) {
+    fileprivate func deletePhotos() {
         
-        for photo in photos {
-            context.delete(photo)
-        }
+        // how do I search for the correct photos to delete/use the images to compare data for Photo entity
+        
         print("Photos deleted")
         stack.save()
     }

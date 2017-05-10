@@ -120,7 +120,6 @@
                                             <constraint firstItem="l4k-Rs-bup" firstAttribute="leading" secondItem="YxF-EI-ch8" secondAttribute="leadingMargin" constant="-8" id="wF5-vf-cKh"/>
                                         </constraints>
                                         <connections>
-                                            <outlet property="image" destination="l4k-Rs-bup" id="B7S-bf-elX"/>
                                             <outlet property="imageView" destination="l4k-Rs-bup" id="8MG-Ce-edo"/>
                                         </connections>
                                     </collectionViewCell>
