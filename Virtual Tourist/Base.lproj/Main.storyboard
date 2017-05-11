@@ -149,7 +149,7 @@
                                 <state key="normal" title="Delete"/>
                             </button>
                             <connections>
-                                <action selector="deletePhotos:" destination="8RR-hI-Plj" id="kuj-be-YED"/>
+                                <action selector="deletePhotosFromCollection:" destination="8RR-hI-Plj" id="cx1-gc-jmt"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

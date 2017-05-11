@@ -20,21 +20,22 @@ class PinPhotosViewController: UIViewController {
     @IBOutlet weak var photosView: UICollectionView!
     
     @IBAction func newCollectionButton(_ sender: Any) {
-        // delete photos from Pins
+        // delete photos from Pin
         photos.removeAll()
         photosMO.removeAll()
         loadPhotos()
         
     }
     
-    @IBAction func deletePhotos(_ sender: Any) {
-        
+    @IBAction func deletePhotosFromCollection(_ sender: Any) {
         photosView.deleteItems(at: photoIndexes)
         // remove deleted photos from data source... collectionView.indexPathForSelectedItems()...? if i also use sort method will it permanently change photos array below?
         self.deleteButton.isEnabled = false
         self.photoIndexes.removeAll()
         deletePhotos()
+
     }
+   
     
     @IBOutlet weak var deleteButton: UIBarButtonItem!
     
