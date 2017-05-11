@@ -20,6 +20,10 @@ class PinPhotosViewController: UIViewController {
     @IBOutlet weak var photosView: UICollectionView!
     
     @IBAction func newCollectionButton(_ sender: Any) {
+        // delete photos from Pins
+        photos.removeAll()
+        photosMO.removeAll()
+        loadPhotos()
         
     }
     
@@ -59,12 +63,13 @@ class PinPhotosViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         setMapView()
-        loadPhotos() // CUrrently returning the same page over and over
+        loadPhotos() // Currently returning the same photos over and over
         self.deleteButton.isEnabled = false
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        
+    override func viewWillDisappear(_ animated: Bool) {
+        self.photos.removeAll()
+        self.photosMO.removeAll()
     }
 }
 
@@ -92,10 +97,19 @@ extension PinPhotosViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
         photoIndexes.append(indexPath)
+        
+        let cell = collectionView.cellForItem(at: indexPath)
+        cell?.layer.borderWidth = 4.0
+        cell?.layer.borderColor = UIColor.blue.cgColor
+        
         deleteButton.isEnabled = true
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        
+        let cell = collectionView.cellForItem(at: indexPath)
+        cell?.layer.borderWidth = 0.0
+        cell?.layer.borderColor = UIColor.clear.cgColor
         
         while photoIndexes.contains(indexPath) {
             if let itemToRemoveIndex = photoIndexes.index(of: indexPath) {
@@ -114,27 +128,18 @@ extension PinPhotosViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        let cellSize = (self.view.frame.size.width / 4)
+        let cellSize = (self.view.frame.size.width / 3.3)
         
         return CGSize(width: cellSize, height: cellSize)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        let leftRightInset = self.view.frame.size.width / 10.0
+        let leftRightInset = self.view.frame.size.width / 47.0
         let topBottomInset = CGFloat(0)
         
         return UIEdgeInsetsMake(topBottomInset, leftRightInset, topBottomInset, leftRightInset)
         
     }
-    
-        //    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        //        <#code#>
-        //    }
-        
-        //    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        //        <#code#>
-        //    }
-        
 }
 
 
@@ -188,7 +193,7 @@ extension PinPhotosViewController {
         }
     }
     
-    fileprivate func loadPhotos() {
+    fileprivate func loadPhotos() { // Need to add functionality if pin has already been selected to show already downloaded photos
         
         let pin = Pin(title: annotation.title, subtitle: annotation.subtitle, latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context)
         
