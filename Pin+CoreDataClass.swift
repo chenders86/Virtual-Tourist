@@ -20,6 +20,7 @@ public class Pin: NSManagedObject {
             self.subtitle = subtitle
             self.latitude = latitude
             self.longitude = longitude
+            self.hasBeenSelected = false
         } else {
             fatalError("Unable to find Pin entity")
         }

@@ -188,8 +188,7 @@ extension PinPhotosViewController {
                         }
                     }
                 }
-                print("photos loaded")
-                print(photosMO.count)
+                print("\(photosMO.count) photos loaded")
             }
         } catch {
             fatalError("Cannot perform Photo Search")
@@ -206,6 +205,7 @@ extension PinPhotosViewController {
                 pin.addToPhotos(photo)
                 print(photo)
             }
+            pin.hasBeenSelected = true
             self.stack.save()
             self.performPhotoSearch()
         }

@@ -2,7 +2,7 @@
 //  Pin+CoreDataProperties.swift
 //  Virtual Tourist
 //
-//  Created by Casey Henderson on 4/26/17.
+//  Created by Casey Henderson on 5/13/17.
 //  Copyright © 2017 Casey Henderson. All rights reserved.
 //
 
@@ -16,6 +16,7 @@ extension Pin {
         return NSFetchRequest<Pin>(entityName: "Pin");
     }
 
+    @NSManaged public var hasBeenSelected: Bool
     @NSManaged public var latitude: Double
     @NSManaged public var longitude: Double
     @NSManaged public var subtitle: String?
