@@ -21,7 +21,7 @@ class PinPhotosViewController: UIViewController {
     
     @IBAction func newCollectionButton(_ sender: Any) {
         // delete photos from Pin
-        photos.removeAll()
+
         photosMO.removeAll()
         loadPhotos()
         
@@ -29,12 +29,13 @@ class PinPhotosViewController: UIViewController {
     
     @IBAction func deletePhotosFromCollection(_ sender: Any) {
         photosView.deleteItems(at: photoIndexes)
-        // remove deleted photos from data source... collectionView.indexPathForSelectedItems()...? if i also use sort method will it permanently change photos array below?
+        print("Delete button pressed")
+        // remove deleted photos from data source...
         self.deleteButton.isEnabled = false
         self.photoIndexes.removeAll()
         deletePhotos()
-
     }
+    
    
     
     @IBOutlet weak var deleteButton: UIBarButtonItem!
@@ -47,11 +48,9 @@ class PinPhotosViewController: UIViewController {
     
     let fetchRequest = NSFetchRequest<Pin>(entityName: "Pin")
     
-    var photosMO = [Photo]()
+    var photosMO = [Photo]() // Data Source
     
-    var photos = [UIImage]()
-    
-    var photoIndexes = [IndexPath]()
+    var photoIndexes = [IndexPath]() // Indexes of Photos to delete
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -64,12 +63,12 @@ class PinPhotosViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         setMapView()
-        loadPhotos() // Currently returning the same photos over and over
+        loadPhotos()
         self.deleteButton.isEnabled = false
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        self.photos.removeAll()
+        
         self.photosMO.removeAll()
     }
 }
@@ -78,15 +77,17 @@ class PinPhotosViewController: UIViewController {
 extension PinPhotosViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return photos.count
+        return photosMO.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = self.photosView.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: indexPath) as! PinImageCollectionViewCell
-        let photo = self.photos[indexPath.row]
+        let photo = self.photosMO[indexPath.row]
         
-        cell.imageView.image = photo
+        let image = UIImage(data: photo.image as! Data)
+        
+        cell.imageView.image = image
         
         return cell
     }
@@ -170,6 +171,7 @@ extension PinPhotosViewController {
     // Setup Functions
     
     private func performPhotoSearch() {
+        print("loading photos...")
         do {
             let fetchedResults = try context.fetch(fetchRequest)
             
@@ -179,12 +181,8 @@ extension PinPhotosViewController {
                 for photo in photoSet {
                     if let image = photo as? Photo {
                         photosMO.append(image)
-                        if let convertedImage = UIImage(data: image.image as! Data) {
-                            photos.append(convertedImage)
-                            print(" converted image: \(convertedImage)")
-                            DispatchQueue.main.async {
-                                self.photosView.reloadData()
-                            }
+                        DispatchQueue.main.async {
+                            self.photosView.reloadData()
                         }
                     }
                 }
@@ -235,10 +233,11 @@ extension PinPhotosViewController {
     
     fileprivate func deletePhotos() {
         
-        // how do I search for the correct photos to delete/use the images to compare data for Photo entity
+        // Implement deletion of Photos here...
         
         print("Photos deleted")
         stack.save()
+        photosView.reloadData()
     }
 }
 

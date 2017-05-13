@@ -142,19 +142,19 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Virtual Tourist" id="piF-FV-SWA">
-                        <barButtonItem key="rightBarButtonItem" style="plain" id="8v2-0k-ygG">
-                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="HXi-q6-Pfk">
+                        <barButtonItem key="rightBarButtonItem" style="plain" id="H3L-io-Qht">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="pYl-MS-o7Z" userLabel="Delete">
                                 <rect key="frame" x="276" y="7" width="83" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Delete"/>
+                                <connections>
+                                    <action selector="deletePhotosFromCollection:" destination="8RR-hI-Plj" eventType="touchUpInside" id="DI2-bm-1fc"/>
+                                </connections>
                             </button>
-                            <connections>
-                                <action selector="deletePhotosFromCollection:" destination="8RR-hI-Plj" id="cx1-gc-jmt"/>
-                            </connections>
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="deleteButton" destination="8v2-0k-ygG" id="UWI-qr-gUw"/>
+                        <outlet property="deleteButton" destination="H3L-io-Qht" id="pPT-Kn-5e9"/>
                         <outlet property="flowLayout" destination="cTZ-hj-dqx" id="R5U-sQ-Lnl"/>
                         <outlet property="miniMapView" destination="hRH-pb-pF7" id="vN1-9F-xIR"/>
                         <outlet property="photosView" destination="fgP-9m-4pf" id="E38-fp-p4x"/>
