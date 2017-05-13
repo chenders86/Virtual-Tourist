@@ -20,20 +20,19 @@ class PinPhotosViewController: UIViewController {
     @IBOutlet weak var photosView: UICollectionView!
     
     @IBAction func newCollectionButton(_ sender: Any) {
-        // delete photos from Pin
-
-        photosMO.removeAll()
-        loadPhotos()
         
+        // delete photos from Pin
+        deleteAllPhotosForPin()
+        photosMO.removeAll()
+        print("photosMO after deletion:  \(photosMO.count)")
+        loadPhotos()
     }
     
     @IBAction func deletePhotosFromCollection(_ sender: Any) {
         photosView.deleteItems(at: photoIndexes)
-        print("Delete button pressed")
-        // remove deleted photos from data source...
         self.deleteButton.isEnabled = false
         self.photoIndexes.removeAll()
-        deletePhotos()
+        deleteSelectedPhotos()
     }
     
    
@@ -47,6 +46,8 @@ class PinPhotosViewController: UIViewController {
     let context = CoreDataStack.sharedInstance().context
     
     let fetchRequest = NSFetchRequest<Pin>(entityName: "Pin")
+    
+    var masterPin: Pin!
     
     var photosMO = [Photo]() // Data Source
     
@@ -176,6 +177,7 @@ extension PinPhotosViewController {
             let fetchedResults = try context.fetch(fetchRequest)
             
             let pin = fetchedResults[0]
+            masterPin = pin
             
             if let photoSet = pin.photos {
                 for photo in photoSet {
@@ -186,6 +188,8 @@ extension PinPhotosViewController {
                         }
                     }
                 }
+                print("photos loaded")
+                print(photosMO.count)
             }
         } catch {
             fatalError("Cannot perform Photo Search")
@@ -231,13 +235,23 @@ extension PinPhotosViewController {
         miniMapView.isScrollEnabled = false
     }
     
-    fileprivate func deletePhotos() {
+    fileprivate func deleteSelectedPhotos() {
         
         // Implement deletion of Photos here...
         
         print("Photos deleted")
         stack.save()
         photosView.reloadData()
+    }
+    
+    fileprivate func deleteAllPhotosForPin () {
+    
+        for photo in masterPin.photos! {
+            context.delete(photo as! NSManagedObject)
+        }
+        stack.save()
+        print("saved (deleteAllPhotosForPin)")
+        print(masterPin.photos ?? "No photos in Pin")
     }
 }
 
