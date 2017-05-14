@@ -157,6 +157,7 @@
                         <outlet property="deleteButton" destination="H3L-io-Qht" id="pPT-Kn-5e9"/>
                         <outlet property="flowLayout" destination="cTZ-hj-dqx" id="R5U-sQ-Lnl"/>
                         <outlet property="miniMapView" destination="hRH-pb-pF7" id="vN1-9F-xIR"/>
+                        <outlet property="newCollectionButton" destination="BdX-wo-fkr" id="Pzy-Xh-lj1"/>
                         <outlet property="photosView" destination="fgP-9m-4pf" id="E38-fp-p4x"/>
                     </connections>
                 </viewController>

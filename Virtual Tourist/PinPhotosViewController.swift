@@ -20,12 +20,13 @@ class PinPhotosViewController: UIViewController {
     @IBOutlet weak var photosView: UICollectionView!
     
     @IBAction func newCollectionButton(_ sender: Any) {
-        
-        // delete photos from Pin
-        deleteAllPhotosForPin()
+        photosView.allowsSelection = false
+        photosView.isScrollEnabled = false
+        newCollectionButton.isEnabled = false
+        context.delete(masterPin!)
         photosMO.removeAll()
         print("photosMO after deletion:  \(photosMO.count)")
-        loadPhotos()
+        initialPhotoLoad()
     }
     
     @IBAction func deletePhotosFromCollection(_ sender: Any) {
@@ -35,8 +36,8 @@ class PinPhotosViewController: UIViewController {
         deleteSelectedPhotos()
     }
     
+    @IBOutlet weak var newCollectionButton: UIButton!
    
-    
     @IBOutlet weak var deleteButton: UIBarButtonItem!
     
     var annotation = MKPointAnnotation()
@@ -47,7 +48,7 @@ class PinPhotosViewController: UIViewController {
     
     let fetchRequest = NSFetchRequest<Pin>(entityName: "Pin")
     
-    var masterPin: Pin!
+    var masterPin: Pin?
     
     var photosMO = [Photo]() // Data Source
     
@@ -64,8 +65,9 @@ class PinPhotosViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         setMapView()
-        loadPhotos()
+        initialPhotoLoad()
         self.deleteButton.isEnabled = false
+        self.newCollectionButton.isEnabled = false
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -171,12 +173,20 @@ extension PinPhotosViewController {
     
     // Setup Functions
     
-    private func performPhotoSearch() {
-        print("loading photos...")
+    private func performPhotoFetch() {
         do {
             let fetchedResults = try context.fetch(fetchRequest)
             
             let pin = fetchedResults[0]
+            
+            if fetchedResults.isEmpty{
+                context.delete(pin)
+                stack.save()
+                loadPhotos()
+                print("Re-downloading photos")
+                return
+            }
+            
             masterPin = pin
             
             if let photoSet = pin.photos {
@@ -185,13 +195,50 @@ extension PinPhotosViewController {
                         photosMO.append(image)
                         DispatchQueue.main.async {
                             self.photosView.reloadData()
+                            self.photosView.allowsMultipleSelection = true
+                            self.photosView.isScrollEnabled = true
+                            self.newCollectionButton.isEnabled = true
                         }
                     }
                 }
                 print("\(photosMO.count) photos loaded")
             }
         } catch {
-            fatalError("Cannot perform Photo Search")
+            fatalError("Cannot perform Photo Search \(error)")
+        }
+    }
+    
+    fileprivate func initialPhotoLoad() {
+        do {
+            let fetchedResults = try context.fetch(fetchRequest)
+            
+            if fetchedResults.isEmpty {
+                loadPhotos()
+                return
+            }
+            
+            let pin = fetchedResults[0]
+            if pin.hasBeenSelected == true {
+                print("Pin has been selected before!")
+                
+                masterPin = pin
+                
+                if let photoSet = pin.photos {
+                    for photo in photoSet {
+                        if let image = photo as? Photo {
+                            photosMO.append(image)
+                            DispatchQueue.main.async {
+                                self.photosView.reloadData()
+                                self.newCollectionButton.isEnabled = true
+                                self.photosView.allowsMultipleSelection = true
+                                self.photosView.isScrollEnabled = true
+                            }
+                        }
+                    }
+                }
+            }
+        } catch {
+            fatalError("Initial photo load failed \(error)")
         }
     }
     
@@ -205,9 +252,10 @@ extension PinPhotosViewController {
                 pin.addToPhotos(photo)
                 print(photo)
             }
-            pin.hasBeenSelected = true
+            pin.setValue(true, forKey: "hasBeenSelected")
             self.stack.save()
-            self.performPhotoSearch()
+            print("Pin has been saved \(pin)")
+            self.performPhotoFetch()
         }
     }
     
@@ -244,14 +292,16 @@ extension PinPhotosViewController {
         photosView.reloadData()
     }
     
-    fileprivate func deleteAllPhotosForPin () {
-    
-        for photo in masterPin.photos! {
-            context.delete(photo as! NSManagedObject)
-        }
-        stack.save()
-        print("saved (deleteAllPhotosForPin)")
-        print(masterPin.photos ?? "No photos in Pin")
-    }
+//    fileprivate func deleteAllPhotosForPin () {
+//        
+//        if let mp = masterPin {
+//            for photo in mp.photos! {
+//                context.delete(photo as! NSManagedObject)
+//            }
+//        }
+//        stack.save()
+//        print("saved (deleteAllPhotosForPin)")
+//        print(masterPin?.photos ?? "No photos in Pin")
+//    }
 }
 
