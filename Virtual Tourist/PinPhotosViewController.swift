@@ -20,19 +20,16 @@ class PinPhotosViewController: UIViewController {
     @IBOutlet weak var photosView: UICollectionView!
     
     @IBAction func newCollectionButton(_ sender: Any) {
-        photosView.allowsSelection = false
-        photosView.isScrollEnabled = false
         newCollectionButton.isEnabled = false
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
         context.delete(masterPin!)
-        photosMO.removeAll()
         print("photosMO after deletion:  \(photosMO.count)")
         initialPhotoLoad()
     }
     
     @IBAction func deletePhotosFromCollection(_ sender: Any) {
-        photosView.deleteItems(at: photoIndexes)
         self.deleteButton.isEnabled = false
-        self.photoIndexes.removeAll()
         deleteSelectedPhotos()
     }
     
@@ -41,6 +38,8 @@ class PinPhotosViewController: UIViewController {
     @IBOutlet weak var deleteButton: UIBarButtonItem!
     
     var annotation = MKPointAnnotation()
+    
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     let stack = CoreDataStack.sharedInstance()
     
@@ -61,6 +60,7 @@ class PinPhotosViewController: UIViewController {
         photosView.dataSource = self
         photosView.allowsMultipleSelection = true
         fetchRequestSetup()
+        self.activityIndicator.hidesWhenStopped = true
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -68,6 +68,7 @@ class PinPhotosViewController: UIViewController {
         initialPhotoLoad()
         self.deleteButton.isEnabled = false
         self.newCollectionButton.isEnabled = false
+        self.activityIndicator.startAnimating()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -83,10 +84,12 @@ extension PinPhotosViewController: UICollectionViewDataSource {
         return photosMO.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell { // Crashes when flipping to landscape
         
         let cell = self.photosView.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: indexPath) as! PinImageCollectionViewCell
         let photo = self.photosMO[indexPath.row]
+        
+        cell.imageView.backgroundColor = UIColor(patternImage: UIImage(named: "america-globe.png")!)
         
         let image = UIImage(data: photo.image as! Data)
         
@@ -177,27 +180,26 @@ extension PinPhotosViewController {
         do {
             let fetchedResults = try context.fetch(fetchRequest)
             
-            let pin = fetchedResults[0]
-            
             if fetchedResults.isEmpty{
-                context.delete(pin)
+                context.delete(fetchedResults[0])
                 stack.save()
                 loadPhotos()
                 print("Re-downloading photos")
                 return
             }
             
+            let pin = fetchedResults[0]
             masterPin = pin
             
             if let photoSet = pin.photos {
+                photosMO.removeAll()
                 for photo in photoSet {
                     if let image = photo as? Photo {
                         photosMO.append(image)
                         DispatchQueue.main.async {
                             self.photosView.reloadData()
-                            self.photosView.allowsMultipleSelection = true
-                            self.photosView.isScrollEnabled = true
                             self.newCollectionButton.isEnabled = true
+                            self.activityIndicator.stopAnimating()
                         }
                     }
                 }
@@ -224,14 +226,14 @@ extension PinPhotosViewController {
                 masterPin = pin
                 
                 if let photoSet = pin.photos {
+                    photosMO.removeAll()
                     for photo in photoSet {
                         if let image = photo as? Photo {
                             photosMO.append(image)
                             DispatchQueue.main.async {
                                 self.photosView.reloadData()
                                 self.newCollectionButton.isEnabled = true
-                                self.photosView.allowsMultipleSelection = true
-                                self.photosView.isScrollEnabled = true
+                                self.activityIndicator.stopAnimating()
                             }
                         }
                     }
@@ -242,7 +244,7 @@ extension PinPhotosViewController {
         }
     }
     
-    fileprivate func loadPhotos() { // Need to add functionality if pin has already been selected to show already downloaded photos
+    fileprivate func loadPhotos() {
         
         let pin = Pin(title: annotation.title, subtitle: annotation.subtitle, latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context)
         
@@ -283,25 +285,17 @@ extension PinPhotosViewController {
         miniMapView.isScrollEnabled = false
     }
     
-    fileprivate func deleteSelectedPhotos() {
+    fileprivate func deleteSelectedPhotos() { // Crashing
         
-        // Implement deletion of Photos here...
-        
-        print("Photos deleted")
+        for indexPath in photoIndexes {
+            let index = indexPath.row
+            context.delete(photosMO[index])
+            print(photosMO.count)
+        }
         stack.save()
+        photosView.deleteItems(at: photoIndexes)
+        self.photoIndexes.removeAll()
         photosView.reloadData()
     }
-    
-//    fileprivate func deleteAllPhotosForPin () {
-//        
-//        if let mp = masterPin {
-//            for photo in mp.photos! {
-//                context.delete(photo as! NSManagedObject)
-//            }
-//        }
-//        stack.save()
-//        print("saved (deleteAllPhotosForPin)")
-//        print(masterPin?.photos ?? "No photos in Pin")
-//    }
 }
 
