@@ -24,7 +24,6 @@ class PinPhotosViewController: UIViewController {
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
         context.delete(masterPin!)
-        print("photosMO after deletion:  \(photosMO.count)")
         initialPhotoLoad()
     }
     
@@ -51,7 +50,7 @@ class PinPhotosViewController: UIViewController {
     
     var photosMO = [Photo]() // Data Source
     
-    var photoIndexes = [IndexPath]() // Indexes of Photos to delete
+    var photoIndexes = [IndexPath]() // Indexes of selected Photos
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -111,17 +110,19 @@ extension PinPhotosViewController: UICollectionViewDelegate {
         cell?.layer.borderColor = UIColor.blue.cgColor
         
         deleteButton.isEnabled = true
+        print("Number of photo indexes: \(photoIndexes.count)")
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         
-        let cell = collectionView.cellForItem(at: indexPath)
-        cell?.layer.borderWidth = 0.0
-        cell?.layer.borderColor = UIColor.clear.cgColor
-        
-        while photoIndexes.contains(indexPath) {
+        if photoIndexes.contains(indexPath) {
+            let cell = collectionView.cellForItem(at: indexPath)
+            cell?.layer.borderWidth = 0.0
+            cell?.layer.borderColor = UIColor.clear.cgColor
+            
             if let itemToRemoveIndex = photoIndexes.index(of: indexPath) {
                 photoIndexes.remove(at: itemToRemoveIndex)
+                print("Number of photo indexes: \(photoIndexes.count)")
             }
         }
         
@@ -183,7 +184,7 @@ extension PinPhotosViewController {
             if fetchedResults.isEmpty{
                 context.delete(fetchedResults[0])
                 stack.save()
-                loadPhotos()
+                loadPhotosFromFlickr()
                 print("Re-downloading photos")
                 return
             }
@@ -199,10 +200,10 @@ extension PinPhotosViewController {
                         DispatchQueue.main.async {
                             self.photosView.reloadData()
                             self.newCollectionButton.isEnabled = true
-                            self.activityIndicator.stopAnimating()
                         }
                     }
                 }
+                self.activityIndicator.stopAnimating()
                 print("\(photosMO.count) photos loaded")
             }
         } catch {
@@ -215,7 +216,7 @@ extension PinPhotosViewController {
             let fetchedResults = try context.fetch(fetchRequest)
             
             if fetchedResults.isEmpty {
-                loadPhotos()
+                loadPhotosFromFlickr()
                 return
             }
             
@@ -233,10 +234,10 @@ extension PinPhotosViewController {
                             DispatchQueue.main.async {
                                 self.photosView.reloadData()
                                 self.newCollectionButton.isEnabled = true
-                                self.activityIndicator.stopAnimating()
                             }
                         }
                     }
+                    self.activityIndicator.stopAnimating()
                 }
             }
         } catch {
@@ -244,7 +245,7 @@ extension PinPhotosViewController {
         }
     }
     
-    fileprivate func loadPhotos() {
+    fileprivate func loadPhotosFromFlickr() {
         
         let pin = Pin(title: annotation.title, subtitle: annotation.subtitle, latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context)
         
@@ -285,17 +286,36 @@ extension PinPhotosViewController {
         miniMapView.isScrollEnabled = false
     }
     
-    fileprivate func deleteSelectedPhotos() { // Crashing
+    fileprivate func deleteSelectedPhotos() {
+        
+        var photosToDelete = [Photo]()
         
         for indexPath in photoIndexes {
             let index = indexPath.row
-            context.delete(photosMO[index])
+            photosToDelete.append(photosMO[index])
+            context.delete(photosMO[index]) // Note: This does not delete contents from array which is why we append to reference array above
+        }
+        
+        for photo in photosToDelete {
+           let index = photosMO.index(of: photo)
+            photosMO.remove(at: index!)
             print(photosMO.count)
         }
+        
         stack.save()
+        removeBorder()
         photosView.deleteItems(at: photoIndexes)
         self.photoIndexes.removeAll()
         photosView.reloadData()
+    }
+    
+    fileprivate func removeBorder() {
+        
+        for photo in photoIndexes {
+            let cell = photosView.cellForItem(at: photo)
+            cell?.layer.borderWidth = 0.0
+            cell?.layer.borderColor = UIColor.clear.cgColor
+        }
     }
 }
 

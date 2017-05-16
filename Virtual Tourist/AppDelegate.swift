@@ -21,7 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             print("This app has launched before!")
         } else {
             print("This is the first launch!")
-            UserDefaults.standard.set(true, forKey: "HasLaunchedBefore")
+            //UserDefaults.standard.set(true, forKey: "HasLaunchedBefore")
             UserDefaults.standard.set(39.5, forKey: "MapCenterLat")
             UserDefaults.standard.set(-98.35, forKey: "MapCenterLon")
             UserDefaults.standard.set(60.0, forKey: "MapDeltaLat")

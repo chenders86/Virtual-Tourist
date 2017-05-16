@@ -109,16 +109,20 @@ extension MapViewController: MKMapViewDelegate {
         UserDefaults.standard.set((self.mapView.region.center.longitude) as Double, forKey: "MapCenterLon")
         UserDefaults.standard.set((self.mapView.region.span.latitudeDelta) as Double, forKey: "MapDeltaLat")
         UserDefaults.standard.set((self.mapView.region.span.longitudeDelta) as Double, forKey: "MapDeltaLon")
+        print("\(self.mapView.region.span.latitudeDelta), \(self.mapView.region.span.longitudeDelta)")
     }
 }
     
 
 extension MapViewController: CLLocationManagerDelegate {
     
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) { // For some reason this overrides my setMapCenter
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         
-        if status == .authorizedWhenInUse {
+        if UserDefaults.standard.bool(forKey: "HasLaunchedBefore") == false && status == .authorizedWhenInUse {
+            
             getUserLocation()
+
+            UserDefaults.standard.set(true, forKey: "HasLaunchedBefore")
         }
     }
     
@@ -199,6 +203,7 @@ extension MapViewController {
         
         mapView.region.center = centerCoordinates
         mapView.region.span = coordSpan
+        print(mapView.region.span)
     }
     
     fileprivate func displayPins() {
