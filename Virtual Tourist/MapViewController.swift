@@ -182,6 +182,8 @@ extension MapViewController {
             }
             
             mapView.addAnnotation(annotation)
+            
+            // Insert flickr functions
         }
     }
     

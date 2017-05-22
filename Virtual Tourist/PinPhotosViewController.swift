@@ -83,7 +83,7 @@ extension PinPhotosViewController: UICollectionViewDataSource {
         return photosMO.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell { // Crashes when flipping to landscape
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = self.photosView.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: indexPath) as! PinImageCollectionViewCell
         let photo = self.photosMO[indexPath.row]
@@ -245,7 +245,7 @@ extension PinPhotosViewController {
         }
     }
     
-    fileprivate func loadPhotosFromFlickr() {
+    func loadPhotosFromFlickr() {
         
         let pin = Pin(title: annotation.title, subtitle: annotation.subtitle, latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude, context: context)
         
@@ -299,7 +299,6 @@ extension PinPhotosViewController {
         for photo in photosToDelete {
            let index = photosMO.index(of: photo)
             photosMO.remove(at: index!)
-            print(photosMO.count)
         }
         
         stack.save()
