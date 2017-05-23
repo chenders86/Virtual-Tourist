@@ -175,6 +175,8 @@ class FlickerClient: NSObject {
                     return
                 }
                 
+                // Do I put photoArray^ in the closure expression and then convert data like below? Or will this not work outside of this network function?
+                
                 var allPhotos = [Photo]()
                 
                 for photo in photoArray {
