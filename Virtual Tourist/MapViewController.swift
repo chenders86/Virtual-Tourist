@@ -31,8 +31,7 @@ class MapViewController: UIViewController {
         self.mapView.removeAnnotations(mapView.annotations)
         do {
             try stack.dropAllData()
-            print("Pins deleted")
-            print("stack saved")
+            print("Pins deleted, stack saved")
         } catch {
             print("Error droping all objects in Database")
         }

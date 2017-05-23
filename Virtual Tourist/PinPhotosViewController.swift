@@ -21,8 +21,8 @@ class PinPhotosViewController: UIViewController {
     
     @IBAction func newCollectionButton(_ sender: Any) {
         newCollectionButton.isEnabled = false
-        activityIndicator.isHidden = false
-        activityIndicator.startAnimating()
+        photosMO.removeAll()
+        photosView.reloadData()
         context.delete(masterPin!)
         initialPhotoLoad()
     }
@@ -35,8 +35,6 @@ class PinPhotosViewController: UIViewController {
     @IBOutlet weak var newCollectionButton: UIButton!
    
     @IBOutlet weak var deleteButton: UIBarButtonItem!
-    
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     var annotation = MKPointAnnotation()
     
@@ -59,7 +57,6 @@ class PinPhotosViewController: UIViewController {
         photosView.dataSource = self
         photosView.allowsMultipleSelection = true
         fetchRequestSetup()
-        self.activityIndicator.hidesWhenStopped = true
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -67,7 +64,6 @@ class PinPhotosViewController: UIViewController {
         initialPhotoLoad()
         self.deleteButton.isEnabled = false
         self.newCollectionButton.isEnabled = false
-        self.activityIndicator.startAnimating()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -215,7 +211,6 @@ extension PinPhotosViewController {
                         }
                     }
                 }
-                self.activityIndicator.stopAnimating()
                 print("\(photosMO.count) photos loaded")
             }
         } catch {
@@ -239,7 +234,7 @@ extension PinPhotosViewController {
                 masterPin = pin
                 
                 if let photoSet = pin.photos {
-                    photosMO.removeAll()
+                    //photosMO.removeAll()
                     for photo in photoSet {
                         if let image = photo as? Photo {
                             photosMO.append(image)
@@ -249,7 +244,6 @@ extension PinPhotosViewController {
                             }
                         }
                     }
-                    self.activityIndicator.stopAnimating()
                 }
             }
         } catch {

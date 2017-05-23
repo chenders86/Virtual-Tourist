@@ -175,9 +175,6 @@ class FlickerClient: NSObject {
                     return
                 }
                 
-                // Array
-                // Reload Tableview
-                
                 var allPhotos = [Photo]()
                 
                 for photo in photoArray {
