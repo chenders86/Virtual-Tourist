@@ -36,9 +36,9 @@ class PinPhotosViewController: UIViewController {
    
     @IBOutlet weak var deleteButton: UIBarButtonItem!
     
-    var annotation = MKPointAnnotation()
-    
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
+    var annotation = MKPointAnnotation()
     
     let stack = CoreDataStack.sharedInstance()
     
@@ -80,21 +80,33 @@ class PinPhotosViewController: UIViewController {
 extension PinPhotosViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return photosMO.count
+        
+        if photosMO.isEmpty {
+            return Int(Constants.FlickrParameterValues.PerPage)!
+        } else {
+            return photosMO.count
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = self.photosView.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: indexPath) as! PinImageCollectionViewCell
-        let photo = self.photosMO[indexPath.row]
-        
-        cell.imageView.backgroundColor = UIColor(patternImage: UIImage(named: "america-globe.png")!)
-        
-        let image = UIImage(data: photo.image as! Data)
-        
-        cell.imageView.image = image
-        
-        return cell
+        if photosMO.isEmpty {
+            
+            let cell = self.photosView.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: indexPath) as! PinImageCollectionViewCell
+            cell.imageView.image = UIImage(named: "america-globe.png")!
+            return cell
+            
+        } else {
+            
+            let cell = self.photosView.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: indexPath) as! PinImageCollectionViewCell
+            let photo = self.photosMO[indexPath.row]
+            
+            let image = UIImage(data: photo.image as! Data)
+            
+            cell.imageView.image = image
+            
+            return cell
+        }
     }
 }
 
