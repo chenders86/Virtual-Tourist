@@ -97,7 +97,7 @@ extension PinPhotosViewController: UICollectionViewDataSource {
             let cell = self.photosView.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: indexPath) as! PinImageCollectionViewCell
             let photo = self.photosMO[indexPath.row]
             
-            let image = UIImage(data: photo.image as! Data)
+            let image = UIImage(data: photo.image as! Data) // Possible location for NSData download
             
             cell.imageView.image = image
             
@@ -207,7 +207,7 @@ extension PinPhotosViewController {
                         photosMO.append(image)
                         DispatchQueue.main.async {
                             self.photosView.reloadData()
-                            self.newCollectionButton.isEnabled = true
+                            self.newCollectionButton.isEnabled = true // Possibly need to change this up
                         }
                     }
                 }

@@ -175,14 +175,12 @@ class FlickerClient: NSObject {
                     return
                 }
                 
-                // Do I put photoArray^ in the closure expression and then convert data like below? Or will this not work outside of this network function?
-                
                 var allPhotos = [Photo]()
                 
                 for photo in photoArray {
                     if let urlM = photo["url_m"] as? String {
                         if let photoData = NSData(contentsOf: URL(string: urlM)!) {
-                            let photo = Photo(imageData: photoData, context: self.context)
+                            let photo = Photo(imageData: photoData, context: self.context) // Convert URL to string attribute in Photo... add attribute to Photo.
                             allPhotos.append(photo)
                             print(photo)
                         }
