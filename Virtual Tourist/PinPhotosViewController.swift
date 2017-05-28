@@ -21,8 +21,6 @@ class PinPhotosViewController: UIViewController {
     
     @IBAction func newCollectionButton(_ sender: Any) {
         newCollectionButton.isEnabled = false
-        photosMO.removeAll()
-        photosView.reloadData()
         context.delete(masterPin!)
         initialPhotoLoad()
     }
@@ -77,32 +75,39 @@ extension PinPhotosViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        if photosMO.isEmpty {
-            return Int(Constants.FlickrParameterValues.PerPage)!
-        } else {
             return photosMO.count
-        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        if photosMO.isEmpty {
+        let cell = self.photosView.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: indexPath) as! PinImageCollectionViewCell
+        let photo = self.photosMO[indexPath.row]
+        
+        if photo.image == nil {
+            cell.imageView.image = UIImage(named: "america-globe.png")
             
-            let cell = self.photosView.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: indexPath) as! PinImageCollectionViewCell
-            cell.imageView.image = UIImage(named: "america-globe.png")!
-            return cell
-            
+            if let globeImage = UIImage(named: "america-globe.png") {
+                let globeData = UIImagePNGRepresentation(globeImage)
+                let compareData = UIImagePNGRepresentation(cell.imageView.image!)
+                if globeData == compareData {
+                    DispatchQueue.global(qos: .userInteractive).async {
+                        if let url = URL(string: photo.dataLocation!) {
+                            if let data = NSData(contentsOf: url) {
+                                photo.image = data
+                                self.stack.save()
+                                DispatchQueue.main.sync {
+                                    cell.imageView.image = UIImage(data: photo.image as! Data) // This line crashes when pressing New Collection button too soon.
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         } else {
-            
-            let cell = self.photosView.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: indexPath) as! PinImageCollectionViewCell
-            let photo = self.photosMO[indexPath.row]
-            
-            let image = UIImage(data: photo.image as! Data) // Possible location for NSData download
-            
-            cell.imageView.image = image
-            
-            return cell
+            cell.imageView.image = UIImage(data: photo.image as! Data)
         }
+
+        return cell
     }
 }
 
@@ -207,7 +212,7 @@ extension PinPhotosViewController {
                         photosMO.append(image)
                         DispatchQueue.main.async {
                             self.photosView.reloadData()
-                            self.newCollectionButton.isEnabled = true // Possibly need to change this up
+                            self.newCollectionButton.isEnabled = true
                         }
                     }
                 }
@@ -234,13 +239,13 @@ extension PinPhotosViewController {
                 masterPin = pin
                 
                 if let photoSet = pin.photos {
-                    //photosMO.removeAll()
+                    photosMO.removeAll()
                     for photo in photoSet {
                         if let image = photo as? Photo {
                             photosMO.append(image)
                             DispatchQueue.main.async {
-                                self.photosView.reloadData()
-                                self.newCollectionButton.isEnabled = true
+                            self.photosView.reloadData()
+                            self.newCollectionButton.isEnabled = true
                             }
                         }
                     }

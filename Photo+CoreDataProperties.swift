@@ -2,7 +2,7 @@
 //  Photo+CoreDataProperties.swift
 //  Virtual Tourist
 //
-//  Created by Casey Henderson on 4/26/17.
+//  Created by Casey Henderson on 5/27/17.
 //  Copyright © 2017 Casey Henderson. All rights reserved.
 //
 
@@ -17,6 +17,7 @@ extension Photo {
     }
 
     @NSManaged public var image: NSData?
+    @NSManaged public var dataLocation: String?
     @NSManaged public var pin: Pin?
 
 }
