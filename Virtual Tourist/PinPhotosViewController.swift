@@ -91,12 +91,13 @@ extension PinPhotosViewController: UICollectionViewDataSource {
                 let compareData = UIImagePNGRepresentation(cell.imageView.image!)
                 if globeData == compareData {
                     DispatchQueue.global(qos: .userInteractive).async {
-                        if let url = URL(string: photo.dataLocation!) {
-                            if let data = NSData(contentsOf: url) {
+                        if let location = photo.dataLocation {
+                            let url = URL(string: location)
+                            if let data = NSData(contentsOf: url!) {
                                 photo.image = data
                                 self.stack.save()
                                 DispatchQueue.main.sync {
-                                    cell.imageView.image = UIImage(data: photo.image as! Data) // This line crashes when pressing New Collection button too soon.
+                                    cell.imageView.image = UIImage(data: data as Data)
                                 }
                             }
                         }
@@ -193,15 +194,7 @@ extension PinPhotosViewController {
     private func performPhotoFetch() {
         do {
             let fetchedResults = try context.fetch(fetchRequest)
-            
-            if fetchedResults.isEmpty{
-                context.delete(fetchedResults[0])
-                stack.save()
-                loadPhotosFromFlickr()
-                print("Re-downloading photos")
-                return
-            }
-            
+                        
             let pin = fetchedResults[0]
             masterPin = pin
             
@@ -210,12 +203,13 @@ extension PinPhotosViewController {
                 for photo in photoSet {
                     if let image = photo as? Photo {
                         photosMO.append(image)
-                        DispatchQueue.main.async {
-                            self.photosView.reloadData()
-                            self.newCollectionButton.isEnabled = true
-                        }
                     }
                 }
+                DispatchQueue.main.async {
+                    self.photosView.reloadData()
+                    self.newCollectionButton.isEnabled = true
+                }
+
                 print("\(photosMO.count) photos loaded")
             }
         } catch {
@@ -243,12 +237,13 @@ extension PinPhotosViewController {
                     for photo in photoSet {
                         if let image = photo as? Photo {
                             photosMO.append(image)
-                            DispatchQueue.main.async {
-                            self.photosView.reloadData()
-                            self.newCollectionButton.isEnabled = true
-                            }
                         }
                     }
+                    DispatchQueue.main.async {
+                        self.photosView.reloadData()
+                        self.newCollectionButton.isEnabled = true
+                    }
+
                 }
             }
         } catch {
@@ -262,14 +257,27 @@ extension PinPhotosViewController {
         
         
         FlickerClient.sharedInstance().getRandomPhotosForPin(pin: pin) { photos in
-            for photo in photos {
-                pin.addToPhotos(photo)
-                print(photo)
+            
+            if photos.isEmpty {
+                
+                let alertController = UIAlertController(title: "No Photos", message: "No photos to display, please choose another location or try again.", preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "OK", style: .default, handler: { (UIAlertAction) in
+                    self.dismiss(animated: true, completion: nil)
+                })
+                alertController.addAction(okAction)
+                self.present(alertController, animated: true, completion: nil)
+                
+            } else {
+                
+                for photo in photos {
+                    pin.addToPhotos(photo)
+                    print(photo)
+                }
+                pin.setValue(true, forKey: "hasBeenSelected")
+                self.stack.save()
+                print("Pin has been saved \(pin)")
+                self.performPhotoFetch()
             }
-            pin.setValue(true, forKey: "hasBeenSelected")
-            self.stack.save()
-            print("Pin has been saved \(pin)")
-            self.performPhotoFetch()
         }
     }
     

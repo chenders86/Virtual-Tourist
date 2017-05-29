@@ -97,7 +97,7 @@ struct CoreDataStack {
                 self.persistingContext.perform() {
                     do {
                         try self.persistingContext.save()
-                        print("stack saved")
+                        //print("stack saved")
                     } catch {
                         fatalError("Error while saving persisting context: \(error)")
                     }
@@ -113,8 +113,6 @@ struct CoreDataStack {
         try coordinator.destroyPersistentStore(at: dbURL, ofType: NSSQLiteStoreType , options: nil)
         try addStoreCoordinator(NSSQLiteStoreType, configuration: nil, storeURL: dbURL, options: nil)
     }
-    
-    // singleton -> CoreDataStack -> once
     
     static func sharedInstance() -> CoreDataStack  {
         struct Singleton {
