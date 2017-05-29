@@ -12,6 +12,9 @@ import CoreData
 
 class PinPhotosViewController: UIViewController {
     
+    fileprivate let sectionInsets = UIEdgeInsets(top: 5.0, left: 15.0, bottom: 5.0, right: 15.0)
+    
+    fileprivate let itemsPerRow: CGFloat = 3
     
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
@@ -21,7 +24,10 @@ class PinPhotosViewController: UIViewController {
     
     @IBAction func newCollectionButton(_ sender: Any) {
         newCollectionButton.isEnabled = false
+        if let _ = masterPin {
         context.delete(masterPin!)
+        stack.save()
+        }
         initialPhotoLoad()
     }
     
@@ -151,17 +157,16 @@ extension PinPhotosViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        let cellSize = (self.view.frame.size.width / 3.3)
+        let paddingSpace = sectionInsets.left * (itemsPerRow + 1)
+        let availableWidth = view.frame.width - paddingSpace
+        let widthPerItem = availableWidth / itemsPerRow
         
-        return CGSize(width: cellSize, height: cellSize)
+        return CGSize(width: widthPerItem, height: widthPerItem)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        let leftRightInset = self.view.frame.size.width / 47.0
-        let topBottomInset = CGFloat(0)
         
-        return UIEdgeInsetsMake(topBottomInset, leftRightInset, topBottomInset, leftRightInset)
-        
+        return sectionInsets
     }
 }
 
@@ -218,8 +223,9 @@ extension PinPhotosViewController {
     }
     
     fileprivate func initialPhotoLoad() {
+        print("loading...")
         do {
-            let fetchedResults = try context.fetch(fetchRequest)
+            var fetchedResults = try context.fetch(fetchRequest)
             
             if fetchedResults.isEmpty {
                 loadPhotosFromFlickr()
@@ -263,6 +269,9 @@ extension PinPhotosViewController {
                 let alertController = UIAlertController(title: "No Photos", message: "No photos to display, please choose another location or try again.", preferredStyle: .alert)
                 let okAction = UIAlertAction(title: "OK", style: .default, handler: { (UIAlertAction) in
                     self.dismiss(animated: true, completion: nil)
+                    self.newCollectionButton.isEnabled = true
+                    self.context.delete(pin)
+                    self.stack.save()
                 })
                 alertController.addAction(okAction)
                 self.present(alertController, animated: true, completion: nil)

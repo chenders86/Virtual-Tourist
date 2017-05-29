@@ -46,7 +46,7 @@ struct Constants {
         static let MediaType = "photos"
         static let MediumURL = "url_m"
         static let UseSafeSearch = "1"
-        static let PerPage = "27"
+        static let PerPage = "30"
         static let Radius = "5"
         static let RadiusUnits = "mi"
     }
