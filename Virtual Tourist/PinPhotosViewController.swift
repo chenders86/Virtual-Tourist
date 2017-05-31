@@ -12,7 +12,7 @@ import CoreData
 
 class PinPhotosViewController: UIViewController {
     
-    fileprivate let sectionInsets = UIEdgeInsets(top: 5.0, left: 15.0, bottom: 5.0, right: 15.0)
+    fileprivate let sectionInsets = UIEdgeInsets(top: 5.0, left: 12.0, bottom: 5.0, right: 12.0)
     
     fileprivate let itemsPerRow: CGFloat = 3
     
@@ -223,12 +223,13 @@ extension PinPhotosViewController {
     }
     
     fileprivate func initialPhotoLoad() {
-        print("loading...")
+        
         do {
             var fetchedResults = try context.fetch(fetchRequest)
             
             if fetchedResults.isEmpty {
                 loadPhotosFromFlickr()
+                print("loading...")
                 return
             }
             
@@ -267,7 +268,7 @@ extension PinPhotosViewController {
             if photos.isEmpty {
                 
                 let alertController = UIAlertController(title: "No Photos", message: "No photos to display, please choose another location or try again.", preferredStyle: .alert)
-                let okAction = UIAlertAction(title: "OK", style: .default, handler: { (UIAlertAction) in
+                let okAction = UIAlertAction(title: "OK", style: .default, handler: { (action: UIAlertAction) in
                     self.dismiss(animated: true, completion: nil)
                     self.newCollectionButton.isEnabled = true
                     self.context.delete(pin)

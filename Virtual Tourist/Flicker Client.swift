@@ -105,7 +105,7 @@ class FlickerClient: NSObject {
     
     private func getPhotosForPin(pin pinView: Pin, numberOfPages: Int, completionForGetPhotos: @escaping (_ photos: [Photo]) -> Void) {
         
-    
+        // This booger below is on the main thread but being accessed from a background thread... I think. The argument Pin is placed into the main context in PinPhotosViewController where this function is first invoked.
         let lat = pinView.latitude
         let lon = pinView.longitude
         let latString = String(lat)
