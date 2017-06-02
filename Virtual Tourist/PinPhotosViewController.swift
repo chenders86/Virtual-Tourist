@@ -70,9 +70,14 @@ class PinPhotosViewController: UIViewController {
         self.newCollectionButton.isEnabled = false
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        
+//    override func viewWillDisappear(_ animated: Bool) {
+//        self.photosMO.removeAll()
+//        super.viewWillDisappear(true)
+//    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
         self.photosMO.removeAll()
+        super.viewDidDisappear(true)
     }
 }
 
@@ -96,14 +101,14 @@ extension PinPhotosViewController: UICollectionViewDataSource {
                 let globeData = UIImagePNGRepresentation(globeImage)
                 let compareData = UIImagePNGRepresentation(cell.imageView.image!)
                 if globeData == compareData {
-                    DispatchQueue.global(qos: .userInteractive).async {
-                        if let location = photo.dataLocation {
+                    if let location = photo.dataLocation {
+                        DispatchQueue.global(qos: .userInteractive).async {
                             let url = URL(string: location)
                             if let data = NSData(contentsOf: url!) {
-                                photo.image = data
-                                self.stack.save()
                                 DispatchQueue.main.sync {
                                     cell.imageView.image = UIImage(data: data as Data)
+                                    photo.image = data
+                                    self.stack.save()
                                 }
                             }
                         }
@@ -281,11 +286,10 @@ extension PinPhotosViewController {
                 
                 for photo in photos {
                     pin.addToPhotos(photo)
-                    print(photo)
+                    //print(photo)
                 }
                 pin.setValue(true, forKey: "hasBeenSelected")
                 self.stack.save()
-                print("Pin has been saved \(pin)")
                 self.performPhotoFetch()
             }
         }

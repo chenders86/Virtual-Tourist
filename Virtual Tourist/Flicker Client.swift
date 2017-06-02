@@ -92,12 +92,12 @@ class FlickerClient: NSObject {
                     print("Pages key not found")
                     return
                 }
-                
-                self.getPhotosForPin(pin: pinView, numberOfPages: totalPages) { photos in
-                    completionHandlerForRandomPhotos(photos)
+                DispatchQueue.main.async {
+                    self.getPhotosForPin(pin: pinView, numberOfPages: totalPages) { photos in
+                        completionHandlerForRandomPhotos(photos)
+                    }
                 }
             }
-            
         }
         
         task.resume()
@@ -106,12 +106,13 @@ class FlickerClient: NSObject {
     private func getPhotosForPin(pin pinView: Pin, numberOfPages: Int, completionForGetPhotos: @escaping (_ photos: [Photo]) -> Void) {
         
         // This booger below is on the main thread but being accessed from a background thread... I think. The argument Pin is placed into the main context in PinPhotosViewController where this function is first invoked.
+        
         let lat = pinView.latitude
         let lon = pinView.longitude
         let latString = String(lat)
         let lonString = String(lon)
         
-        let pageLimit = min(numberOfPages, 50)
+        let pageLimit = min(numberOfPages, 100)
         let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
         print("\(numberOfPages) total pages")
         print("\(pageLimit) page limit")
@@ -177,15 +178,17 @@ class FlickerClient: NSObject {
                 
                 var allPhotos = [Photo]()
                 
-                for photo in photoArray {
-                    if let urlM = photo["url_m"] as? String {
-                        let photo = Photo(dataLocation: urlM, context: self.context)
-                        allPhotos.append(photo)
-                        print(photo)
+                DispatchQueue.main.async {
+                    for photo in photoArray {
+                        if let urlM = photo["url_m"] as? String {
+                            let photo = Photo(dataLocation: urlM, context: self.context)
+                            allPhotos.append(photo)
+                            //print(photo)
+                        }
                     }
+                    
+                    completionForGetPhotos(allPhotos)
                 }
-                
-                completionForGetPhotos(allPhotos)
             }
         }
         
