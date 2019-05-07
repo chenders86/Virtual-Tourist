@@ -26,6 +26,8 @@ class MapViewController: UIViewController {
     
     var locationManager = CLLocationManager()
     
+    var feedbackGenerator: UIImpactFeedbackGenerator? = nil
+    
     
     @IBAction func clearPinData(_ sender: UIButton) {
         self.mapView.removeAnnotations(mapView.annotations)
@@ -47,7 +49,7 @@ class MapViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        self.navigationController?.hidesBarsOnSwipe = true
+        self.navigationController?.hidesBarsOnSwipe = false
         setMapCenter()
         displayPins()
     }
@@ -82,7 +84,7 @@ extension MapViewController: MKMapViewDelegate {
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseID)
             pinView?.canShowCallout = true
             pinView?.pinTintColor = .red
-            //pinView?.isDraggable = true
+            pinView?.isDraggable = false
             pinView?.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
             
         } else {
@@ -102,6 +104,19 @@ extension MapViewController: MKMapViewDelegate {
         }
 
     }
+    
+    
+//    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, didChange newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
+//        switch newState {
+//        case .starting:
+//            feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
+//            feedbackGenerator?.impactOccurred()
+//        case .ending:
+//            view.dragState = .none
+//            feedbackGenerator = nil
+//        default: break
+//        }
+//    }
     
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         UserDefaults.standard.set((self.mapView.region.center.latitude) as Double, forKey: "MapCenterLat")
@@ -133,7 +148,7 @@ extension MapViewController: CLLocationManagerDelegate {
         
         let coordinates = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
         
-        let span = MKCoordinateSpanMake(1.0,1.0)
+        let span = MKCoordinateSpan.init(latitudeDelta: 1.0,longitudeDelta: 1.0)
         
         let region = MKCoordinateRegion(center: coordinates, span: span)
         
@@ -151,7 +166,8 @@ extension MapViewController {
 
     // Extra setup functions
 
-    func addUserPin(gestureRecognizer: UIGestureRecognizer) {
+    @objc func addUserPin(gestureRecognizer: UIGestureRecognizer) {
+        print("Gesture Began")
         if gestureRecognizer.state == .began {
             
             let touchPoint = gestureRecognizer.location(in: mapView)
@@ -181,6 +197,9 @@ extension MapViewController {
             }
             
             mapView.addAnnotation(annotation)
+            feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
+            feedbackGenerator?.impactOccurred()
+            feedbackGenerator = nil
         }
     }
     
@@ -188,6 +207,7 @@ extension MapViewController {
         let uiTouch = UILongPressGestureRecognizer(target: self, action: #selector(addUserPin))
         uiTouch.minimumPressDuration = 0.5
         mapView.addGestureRecognizer(uiTouch)
+        print("added touch")
     }
     
     fileprivate func setMapCenter() {

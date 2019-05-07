@@ -16,6 +16,14 @@ class PinPhotosViewController: UIViewController {
     
     fileprivate let itemsPerRow: CGFloat = 3
     
+    var feedbackGenerator: UIImpactFeedbackGenerator? = nil
+    
+    var touchAndHold: UILongPressGestureRecognizer? = nil
+    
+    var popUpImageView: UIImageView? = nil
+    
+    var popView: UIView? = nil
+    
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
     @IBOutlet weak var miniMapView: MKMapView!
@@ -61,22 +69,19 @@ class PinPhotosViewController: UIViewController {
         photosView.dataSource = self
         photosView.allowsMultipleSelection = true
         fetchRequestSetup()
+        addCellPressGesture()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         setMapView()
         initialPhotoLoad()
-        self.deleteButton.isEnabled = false
-        self.newCollectionButton.isEnabled = false
+        deleteButton.isEnabled = false
+        newCollectionButton.isEnabled = false
     }
     
-//    override func viewWillDisappear(_ animated: Bool) {
-//        self.photosMO.removeAll()
-//        super.viewWillDisappear(true)
-//    }
     
     override func viewDidDisappear(_ animated: Bool) {
-        self.photosMO.removeAll()
+        photosMO.removeAll()
         super.viewDidDisappear(true)
     }
 }
@@ -92,19 +97,20 @@ extension PinPhotosViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = self.photosView.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: indexPath) as! PinImageCollectionViewCell
+        
         let photo = self.photosMO[indexPath.row]
         
         if photo.image == nil {
             cell.imageView.image = UIImage(named: "america-globe.png")
             
             if let globeImage = UIImage(named: "america-globe.png") {
-                let globeData = UIImagePNGRepresentation(globeImage)
-                let compareData = UIImagePNGRepresentation(cell.imageView.image!)
+                let globeData = globeImage.pngData()
+                let compareData = cell.imageView.image!.pngData()
                 if globeData == compareData {
                     if let location = photo.dataLocation {
                         DispatchQueue.global(qos: .userInteractive).async {
                             let url = URL(string: location)
-                            if let data = NSData(contentsOf: url!) {
+                            if let data = NSData(contentsOf: url!) { // This is a network request... therefore put in a background queue.
                                 DispatchQueue.main.sync {
                                     cell.imageView.image = UIImage(data: data as Data)
                                     photo.image = data
@@ -116,7 +122,7 @@ extension PinPhotosViewController: UICollectionViewDataSource {
                 }
             }
         } else {
-            cell.imageView.image = UIImage(data: photo.image as! Data)
+            cell.imageView.image = UIImage(data: photo.image! as Data)
         }
 
         return cell
@@ -145,7 +151,7 @@ extension PinPhotosViewController: UICollectionViewDelegate {
             cell?.layer.borderWidth = 0.0
             cell?.layer.borderColor = UIColor.clear.cgColor
             
-            if let itemToRemoveIndex = photoIndexes.index(of: indexPath) {
+            if let itemToRemoveIndex = photoIndexes.firstIndex(of: indexPath) {
                 photoIndexes.remove(at: itemToRemoveIndex)
                 print("Number of photo indexes: \(photoIndexes.count)")
             }
@@ -196,6 +202,61 @@ extension PinPhotosViewController: MKMapViewDelegate {
     }
 }
 
+extension PinPhotosViewController: UIGestureRecognizerDelegate {
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        
+        return true
+    }
+    
+    fileprivate func addCellPressGesture() {
+            touchAndHold = UILongPressGestureRecognizer(target: self, action: #selector(enlargeImage))
+            touchAndHold?.minimumPressDuration = 0.3
+            touchAndHold?.numberOfTouchesRequired = 1
+            touchAndHold?.numberOfTapsRequired = 0 // 0 is default, any more than this adds extra required taps.
+            touchAndHold?.delegate = self
+        
+            photosView.addGestureRecognizer(touchAndHold!)
+    }
+    
+    @objc func enlargeImage(gestureRecognizer: UILongPressGestureRecognizer) {
+        
+        feedbackGenerator = UIImpactFeedbackGenerator(style: .medium)
+        
+        if gestureRecognizer.state == .began {
+            feedbackGenerator?.impactOccurred()
+            
+            let point = gestureRecognizer.location(in: photosView)
+            let indexPath = photosView.indexPathForItem(at: point)
+            if indexPath != nil {
+                photosView.allowsSelection = false
+                photosView.removeGestureRecognizer(touchAndHold!)
+                let cell = photosView.cellForItem(at: indexPath!) as! PinImageCollectionViewCell
+                let tap = UITapGestureRecognizer(target: self, action: #selector(dismissPopView))
+                tap.delegate = self
+                
+                popUpImageView = UIImageView(image: cell.imageView.image)
+                popUpImageView?.contentMode = .scaleAspectFit
+                popUpImageView?.isUserInteractionEnabled = true
+                popUpImageView?.addGestureRecognizer(tap)
+                popView = UIView(frame: photosView.bounds)
+                popView?.backgroundColor = UIColor.white
+                popUpImageView?.frame = (popView?.bounds)!
+                popView?.addSubview(popUpImageView!)
+                photosView.isScrollEnabled = false
+                newCollectionButton.isEnabled = false
+                
+                UIView.transition(with: photosView, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                    self.photosView.addSubview(self.popView!)
+                }, completion: { (finished) in
+                    self.removeBorder()
+                    self.deleteButton.isEnabled = false
+                    self.photoIndexes.removeAll()
+                })
+            }
+        }
+    }
+}
 
 extension PinPhotosViewController {
     
@@ -286,10 +347,10 @@ extension PinPhotosViewController {
                 
                 for photo in photos {
                     pin.addToPhotos(photo)
-                    //print(photo)
                 }
                 pin.setValue(true, forKey: "hasBeenSelected")
                 self.stack.save()
+                print("[Photos Saved]")
                 self.performPhotoFetch()
             }
         }
@@ -308,12 +369,10 @@ extension PinPhotosViewController {
         
         miniMapView.addAnnotation(annotation)
         
-        let span = MKCoordinateSpanMake(0.5, 0.5)
-        
+        let span = MKCoordinateSpan.init(latitudeDelta: 0.5, longitudeDelta: 0.5)
         let region = MKCoordinateRegion(center: annotation.coordinate, span: span)
         
         miniMapView.setRegion(region, animated: true)
-        
         miniMapView.isRotateEnabled = false
         miniMapView.isZoomEnabled = false
         miniMapView.isScrollEnabled = false
@@ -323,30 +382,40 @@ extension PinPhotosViewController {
         
         var photosToDelete = [Photo]()
         
-        for indexPath in photoIndexes {
-            let index = indexPath.row
-            photosToDelete.append(photosMO[index])
-            context.delete(photosMO[index]) // Note: This does not delete contents from array which is why we append to reference array above
-        }
+        for indexPath in photoIndexes { // Index paths from selected photos in collectionView
+            let index = indexPath.row // Grabs index of photo as this is different from the "indexPath"
+            photosToDelete.append(photosMO[index]) // Appends actual photo to array
+            context.delete(photosMO[index]) // Deletes photo from stored memory. Note: This does not delete contents from array which is why we
+        }                                   // append to reference array above
         
         for photo in photosToDelete {
-           let index = photosMO.index(of: photo)
-            photosMO.remove(at: index!)
+           let index = photosMO.firstIndex(of: photo)
+            photosMO.remove(at: index!) // Removes items from array so they stop appearing in collectionView
         }
         
         stack.save()
         removeBorder()
-        photosView.deleteItems(at: photoIndexes)
-        self.photoIndexes.removeAll()
+        photosView.deleteItems(at: photoIndexes) // Removes currently displayed CELLS from collectionView
+        self.photoIndexes.removeAll() // Removes index pointers
         photosView.reloadData()
     }
     
     fileprivate func removeBorder() {
-        
         for photo in photoIndexes {
             let cell = photosView.cellForItem(at: photo)
             cell?.layer.borderWidth = 0.0
             cell?.layer.borderColor = UIColor.clear.cgColor
+        }
+    }
+    
+    @objc fileprivate func dismissPopView() {
+        UIView.transition(with: photosView, duration: 0.3, options: .transitionCrossDissolve, animations: {
+            self.popView?.removeFromSuperview()
+        }) { (finished) in
+            self.photosView.isScrollEnabled = true
+            self.photosView.allowsMultipleSelection = true
+            self.newCollectionButton.isEnabled = true
+            self.addCellPressGesture()
         }
     }
 }

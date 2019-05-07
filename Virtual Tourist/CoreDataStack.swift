@@ -85,8 +85,8 @@ struct CoreDataStack {
     // Save function
     func save() {
         
-        context.performAndWait() {
-            
+        context.performAndWait() { // Waits for entire block to be executed before returning. Guarantees all saves in app run/save in order.
+                                    // Works best with nested saved function like this.
             if self.context.hasChanges {
                 do {
                     try self.context.save()
@@ -94,7 +94,7 @@ struct CoreDataStack {
                     fatalError("Error while trying to save main context: \(error)")
                 }
                 
-                self.persistingContext.perform() {
+                self.persistingContext.perform() { // If this wasn't nested performAndWait would be used instead to guarantee correct save order.
                     do {
                         try self.persistingContext.save()
                         //print("stack saved")
@@ -114,7 +114,7 @@ struct CoreDataStack {
         try addStoreCoordinator(NSSQLiteStoreType, configuration: nil, storeURL: dbURL, options: nil)
     }
     
-    static func sharedInstance() -> CoreDataStack  {
+    static func sharedInstance() -> CoreDataStack {
         struct Singleton {
             static var sharedInstance = CoreDataStack(modelName: "Virtual_Tourist")
         }
