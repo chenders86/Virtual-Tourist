@@ -90,7 +90,7 @@ extension PinPhotosViewController: UICollectionViewDataSource {
         
         cell.imageView.backgroundColor = UIColor(patternImage: UIImage(named: "america-globe.png")!)
         
-        let image = UIImage(data: photo.image as! Data)
+        let image = UIImage(data: photo.image! as Data)
         
         cell.imageView.image = image
         
@@ -120,7 +120,7 @@ extension PinPhotosViewController: UICollectionViewDelegate {
             cell?.layer.borderWidth = 0.0
             cell?.layer.borderColor = UIColor.clear.cgColor
             
-            if let itemToRemoveIndex = photoIndexes.index(of: indexPath) {
+            if let itemToRemoveIndex = photoIndexes.firstIndex(of: indexPath) {
                 photoIndexes.remove(at: itemToRemoveIndex)
                 print("Number of photo indexes: \(photoIndexes.count)")
             }
@@ -146,7 +146,7 @@ extension PinPhotosViewController: UICollectionViewDelegateFlowLayout {
         let leftRightInset = self.view.frame.size.width / 47.0
         let topBottomInset = CGFloat(0)
         
-        return UIEdgeInsetsMake(topBottomInset, leftRightInset, topBottomInset, leftRightInset)
+        return UIEdgeInsets.init(top: topBottomInset, left: leftRightInset, bottom: topBottomInset, right: leftRightInset)
         
     }
 }
@@ -275,7 +275,7 @@ extension PinPhotosViewController {
         
         miniMapView.addAnnotation(annotation)
         
-        let span = MKCoordinateSpanMake(0.5, 0.5)
+        let span = MKCoordinateSpan.init(latitudeDelta: 0.5, longitudeDelta: 0.5)
         
         let region = MKCoordinateRegion(center: annotation.coordinate, span: span)
         
@@ -297,7 +297,7 @@ extension PinPhotosViewController {
         }
         
         for photo in photosToDelete {
-           let index = photosMO.index(of: photo)
+           let index = photosMO.firstIndex(of: photo)
             photosMO.remove(at: index!)
             print(photosMO.count)
         }

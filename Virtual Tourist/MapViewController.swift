@@ -134,7 +134,7 @@ extension MapViewController: CLLocationManagerDelegate {
         
         let coordinates = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
         
-        let span = MKCoordinateSpanMake(1.0,1.0)
+        let span = MKCoordinateSpan.init(latitudeDelta: 1.0,longitudeDelta: 1.0)
         
         let region = MKCoordinateRegion(center: coordinates, span: span)
         
@@ -152,7 +152,7 @@ extension MapViewController {
 
     // Extra setup functions
 
-    func addUserPin(gestureRecognizer: UIGestureRecognizer) {
+    @objc func addUserPin(gestureRecognizer: UIGestureRecognizer) {
         if gestureRecognizer.state == .began {
             
             let touchPoint = gestureRecognizer.location(in: mapView)
